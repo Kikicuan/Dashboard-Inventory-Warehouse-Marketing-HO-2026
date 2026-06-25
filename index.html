@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KPI Dashboard — PT. Rantai Mulia Kencana 2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #F0F4F8;
+      --bg-2:      #E4ECF4;
+      --white:     #FFFFFF;
+      --steel:     #1B3A5C;
+      --steel-2:   #2A5580;
+      --orange:    #E8610A;
+      --orange-lt: #FFF0E6;
+      --orange-md: rgba(232,97,10,.15);
+      --teal:      #0B8F7A;
+      --teal-lt:   #E6F5F3;
+      --teal-md:   rgba(11,143,122,.15);
+      --blue:      #1A6FC4;
+      --blue-lt:   #E8F2FC;
+      --blue-md:   rgba(26,111,196,.15);
+      --red:       #D93636;
+      --red-lt:    #FDEAEA;
+      --red-md:    rgba(217,54,54,.13);
+      --amber:     #C47B0A;
+      --amber-lt:  #FEF6E4;
+      --text-1:    #0F2133;
+      --text-2:    #3D5570;
+      --text-3:    #7A94B0;
+      --border:    #D3E0EE;
+      --radius:    14px;
+      --shadow:    0 2px 12px rgba(27,58,92,.10);
+      --shadow-lg: 0 6px 32px rgba(27,58,92,.14);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      background: var(--steel);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 68px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 16px rgba(27,58,92,.25);
+    }
+    .logo { display: flex; align-items: center; gap: 14px; }
+    .logo-icon-wrap {
+      width: 44px; height: 44px;
+      background: var(--orange);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-text-main { font-weight: 800; font-size: 15px; letter-spacing: -.01em; }
+    .logo-text-sub  { font-size: 11px; color: rgba(255,255,255,.6); font-weight: 400; margin-top: 1px; }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .badge-live {
+      display: flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #4EE8A8;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.35} }
+    .period-tag {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      color: rgba(255,255,255,.85);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* ─── HERO STRIP ─── */
+    .hero {
+      background: linear-gradient(100deg, var(--steel) 0%, var(--steel-2) 100%);
+      padding: 28px 32px 0;
+      display: flex;
+      align-items: flex-end;
+      gap: 32px;
+      overflow: hidden;
+      position: relative;
+    }
+    .hero-text { flex: 1; padding-bottom: 24px; }
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 6px;
+    }
+    .hero-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+    .hero-sub { font-size: 13px; color: rgba(255,255,255,.6); }
+    .hero-illustration {
+      display: flex;
+      gap: 20px;
+      align-items: flex-end;
+      flex-shrink: 0;
+      opacity: .92;
+    }
+
+    /* ─── TAB NAV ─── */
+    .tab-nav {
+      background: var(--white);
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      gap: 2px;
+      padding: 0 32px;
+      overflow-x: auto;
+    }
+    .tab-nav::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-2);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 14px 20px;
+      cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      margin-bottom: -2px;
+      white-space: nowrap;
+      transition: all .18s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .tab-btn:hover { color: var(--steel); }
+    .tab-btn.active { color: var(--orange); border-bottom-color: var(--orange); }
+    .tab-icon { font-size: 15px; }
+
+    /* ─── PAGE ─── */
+    .page { display: none; padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+    .page.active { display: block; }
+
+    /* ─── SECTION HEADER ─── */
+    .sec-hdr {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .sec-dot {
+      width: 4px; height: 20px;
+      background: var(--orange);
+      border-radius: 99px;
+    }
+    .sec-title { font-size: 13px; font-weight: 700; color: var(--text-1); }
+    .sec-sub   { font-size: 12px; color: var(--text-3); margin-left: auto; }
+
+    /* ─── KPI CARDS ─── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .kpi-card-accent {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 4px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .kpi-card.orange .kpi-card-accent { background: var(--orange); }
+    .kpi-card.teal   .kpi-card-accent { background: var(--teal); }
+    .kpi-card.blue   .kpi-card-accent { background: var(--blue); }
+    .kpi-card.red    .kpi-card-accent { background: var(--red); }
+    .kpi-card.amber  .kpi-card-accent { background: var(--amber); }
+
+    .kpi-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+    .kpi-label { font-size: 11px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: .05em; }
+    .kpi-ico {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .kpi-card.orange .kpi-ico { background: var(--orange-lt); }
+    .kpi-card.teal   .kpi-ico { background: var(--teal-lt); }
+    .kpi-card.blue   .kpi-ico { background: var(--blue-lt); }
+    .kpi-card.red    .kpi-ico { background: var(--red-lt); }
+    .kpi-card.amber  .kpi-ico { background: var(--amber-lt); }
+
+    .kpi-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .kpi-card.orange .kpi-value { color: var(--orange); }
+    .kpi-card.teal   .kpi-value { color: var(--teal); }
+    .kpi-card.blue   .kpi-value { color: var(--blue); }
+    .kpi-card.red    .kpi-value { color: var(--red); }
+    .kpi-card.amber  .kpi-value { color: var(--amber); }
+
+    .kpi-desc { font-size: 11px; color: var(--text-3); }
+    .kpi-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 10px; font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 99px;
+      margin-top: 8px;
+    }
+    .kpi-badge.green  { background: var(--teal-lt);  color: var(--teal);  }
+    .kpi-badge.orange { background: var(--orange-lt); color: var(--orange); }
+    .kpi-badge.red    { background: var(--red-lt);   color: var(--red);   }
+    .kpi-badge.amber  { background: var(--amber-lt); color: var(--amber); }
+    .kpi-badge.blue   { background: var(--blue-lt);  color: var(--blue);  }
+
+    /* ─── CHART CARD ─── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .chart-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+    .chart-card.full { grid-column: 1 / -1; }
+    .chart-head { margin-bottom: 16px; }
+    .chart-title { font-size: 14px; font-weight: 700; color: var(--text-1); margin-bottom: 3px; }
+    .chart-desc  { font-size: 11px; color: var(--text-3); }
+    .chart-wrap { position: relative; height: 240px; }
+    .chart-wrap.tall { height: 320px; }
+    .chart-wrap.xtall { height: 420px; }
+
+    /* ─── TABLE ─── */
+    .tbl-wrap {
+      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+    .tbl-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: var(--bg);
+      color: var(--text-2);
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1.5px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--bg-2);
+      color: var(--text-1);
+      vertical-align: middle;
+      line-height: 1.4;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--bg); }
+
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+    .pill-green  { background: var(--teal-lt);  color: var(--teal);  border: 1px solid rgba(11,143,122,.2); }
+    .pill-orange { background: var(--orange-lt); color: var(--orange); border: 1px solid rgba(232,97,10,.2); }
+    .pill-red    { background: var(--red-lt);   color: var(--red);   border: 1px solid rgba(217,54,54,.2); }
+    .pill-blue   { background: var(--blue-lt);  color: var(--blue);  border: 1px solid rgba(26,111,196,.2); }
+    .pill-amber  { background: var(--amber-lt); color: var(--amber); border: 1px solid rgba(196,123,10,.2); }
+
+    /* ─── PROGRESS BAR ─── */
+    .prog-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--bg-2);
+    }
+    .prog-row:last-child { border-bottom: none; }
+    .prog-rank {
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-2);
+      flex-shrink: 0;
+    }
+    .prog-rank.top { background: var(--orange); color: #fff; }
+    .prog-name { flex: 1; font-size: 12px; color: var(--text-1); font-weight: 500; min-width: 0; }
+    .prog-bar-wrap { width: 160px; flex-shrink: 0; }
+    .prog-track { height: 8px; background: var(--bg-2); border-radius: 99px; overflow: hidden; }
+    .prog-fill  { height: 100%; border-radius: 99px; transition: width 1s ease; }
+    .prog-val   { width: 60px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-2); text-align: right; flex-shrink: 0; }
+
+    /* ─── GAUGE ─── */
+    .gauge-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 900px) { .gauge-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 540px) { .gauge-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .gauge-box {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 12px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .gauge-month { font-size: 11px; font-weight: 700; color: var(--text-2); margin-bottom: 10px; }
+    .gauge-ring  { position: relative; width: 80px; height: 80px; margin: 0 auto 10px; }
+    .gauge-ring svg { transform: rotate(-90deg); }
+    .gauge-pct {
+      position: absolute;
+      inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .gauge-lbl { font-size: 10px; color: var(--text-3); margin-bottom: 6px; }
+
+    /* ─── ICON CARD ─── */
+    .icon-strip {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .icon-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 170px;
+      box-shadow: var(--shadow);
+    }
+    .icon-card svg { flex-shrink: 0; }
+    .icon-card-text .label { font-size: 10px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .06em; }
+    .icon-card-text .val   { font-size: 18px; font-weight: 800; color: var(--text-1); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+    .icon-card-text .sub   { font-size: 10px; color: var(--text-3); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .topbar { padding: 0 16px; }
+      .hero { padding: 20px 16px 0; }
+      .hero-illustration { display: none; }
+      .tab-nav { padding: 0 16px; }
+      .page { padding: 18px 16px; }
+      .chart-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .prog-bar-wrap { width: 90px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── TOPBAR ─── -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-icon-wrap">
+      <!-- Chain/sprocket icon -->
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <circle cx="13" cy="13" r="5" stroke="#fff" stroke-width="2.2"/>
+        <circle cx="13" cy="4" r="2.2" fill="#fff"/>
+        <circle cx="13" cy="22" r="2.2" fill="#fff"/>
+        <circle cx="4" cy="13" r="2.2" fill="#fff"/>
+        <circle cx="22" cy="13" r="2.2" fill="#fff"/>
+        <circle cx="6.5" cy="6.5" r="2" fill="#fff"/>
+        <circle cx="19.5" cy="6.5" r="2" fill="#fff"/>
+        <circle cx="6.5" cy="19.5" r="2" fill="#fff"/>
+        <circle cx="19.5" cy="19.5" r="2" fill="#fff"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text-main">PT. Rantai Mulia Kencana</div>
+      <div class="logo-text-sub">Inventory · Warehouse · Marketing KPI Dashboard</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="period-tag">📅 Jan – Jun 2026</span>
+    <div class="badge-live">
+      <div class="badge-live-dot"></div>
+      Data Aktif
+    </div>
+  </div>
+</header>
+
+<!-- ─── HERO STRIP ─── -->
+<div class="hero">
+  <div class="hero-text">
+    <div class="hero-eyebrow">Dashboard Laporan KPI 2026</div>
+    <div class="hero-title">Conveyor, Chain &amp; Industrial<br>Parts Inventory Control</div>
+    <div class="hero-sub">Monitoring stok, pergerakan barang, dan kinerja work order real-time</div>
+  </div>
+  <div class="hero-illustration">
+    <!-- Conveyor SVG -->
+    <svg width="160" height="90" viewBox="0 0 160 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Conveyor belt body -->
+      <rect x="10" y="40" width="140" height="22" rx="4" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+      <!-- Belt slats -->
+      <line x1="30" y1="40" x2="30" y2="62" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+      <line x1="50" y1="40" x2="50" y2="62" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+      <line x1="70" y1="40" x2="70" y2="62" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+      <line x1="90" y1="40" x2="90" y2="62" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+      <line x1="110" y1="40" x2="110" y2="62" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+      <line x1="130" y1="40" x2="130" y2="62" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+      <!-- Left drum -->
+      <circle cx="20" cy="51" r="12" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5"/>
+      <circle cx="20" cy="51" r="5" fill="rgba(232,97,10,0.7)"/>
+      <!-- Right drum -->
+      <circle cx="140" cy="51" r="12" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5"/>
+      <circle cx="140" cy="51" r="5" fill="rgba(232,97,10,0.7)"/>
+      <!-- Boxes on belt -->
+      <rect x="42" y="26" width="20" height="16" rx="2" fill="rgba(232,97,10,0.75)" stroke="rgba(255,200,100,0.5)" stroke-width="1"/>
+      <line x1="42" y1="34" x2="62" y2="34" stroke="rgba(255,200,100,0.4)" stroke-width="1"/>
+      <line x1="52" y1="26" x2="52" y2="42" stroke="rgba(255,200,100,0.4)" stroke-width="1"/>
+      <rect x="78" y="24" width="24" height="18" rx="2" fill="rgba(232,97,10,0.6)" stroke="rgba(255,200,100,0.4)" stroke-width="1"/>
+      <rect x="115" y="27" width="16" height="14" rx="2" fill="rgba(232,97,10,0.5)" stroke="rgba(255,200,100,0.3)" stroke-width="1"/>
+      <!-- Legs -->
+      <line x1="25" y1="63" x2="20" y2="85" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+      <line x1="135" y1="63" x2="140" y2="85" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+      <line x1="65" y1="63" x2="62" y2="85" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+      <line x1="95" y1="63" x2="98" y2="85" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+      <!-- Ground line -->
+      <line x1="10" y1="86" x2="150" y2="86" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <!-- Arrow motion -->
+      <path d="M68 12 L80 18 L68 24" fill="rgba(232,97,10,0.8)"/>
+      <line x1="30" y1="18" x2="78" y2="18" stroke="rgba(232,97,10,0.5)" stroke-width="1.5" stroke-dasharray="5 3"/>
+    </svg>
+    <!-- Sprocket chain SVG -->
+    <svg width="80" height="90" viewBox="0 0 80 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Large sprocket -->
+      <circle cx="40" cy="44" r="28" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2.5"/>
+      <circle cx="40" cy="44" r="18" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+      <circle cx="40" cy="44" r="6" fill="rgba(232,97,10,0.8)"/>
+      <!-- Teeth -->
+      <rect x="37" y="12" width="6" height="8" rx="2" fill="rgba(255,255,255,0.35)"/>
+      <rect x="37" y="70" width="6" height="8" rx="2" fill="rgba(255,255,255,0.35)"/>
+      <rect x="8" y="41" width="8" height="6" rx="2" fill="rgba(255,255,255,0.35)"/>
+      <rect x="64" y="41" width="8" height="6" rx="2" fill="rgba(255,255,255,0.35)"/>
+      <rect x="16.5" y="19.5" width="6" height="8" rx="2" fill="rgba(255,255,255,0.28)" transform="rotate(45 19.5 23.5)"/>
+      <rect x="57.5" y="19.5" width="6" height="8" rx="2" fill="rgba(255,255,255,0.28)" transform="rotate(-45 60.5 23.5)"/>
+      <rect x="16.5" y="58" width="6" height="8" rx="2" fill="rgba(255,255,255,0.28)" transform="rotate(-45 19.5 62)"/>
+      <rect x="57.5" y="58" width="6" height="8" rx="2" fill="rgba(255,255,255,0.28)" transform="rotate(45 60.5 62)"/>
+      <!-- Spokes -->
+      <line x1="40" y1="28" x2="40" y2="60" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+      <line x1="24" y1="36" x2="56" y2="52" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+      <line x1="56" y1="36" x2="24" y2="52" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ─── TAB NAV ─── -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('overview',this)">
+    <span class="tab-icon">📊</span> Overview
+  </button>
+  <button class="tab-btn" onclick="switchTab('inventory',this)">
+    <span class="tab-icon">🏭</span> Inventory & SOH
+  </button>
+  <button class="tab-btn" onclick="switchTab('movement',this)">
+    <span class="tab-icon">📦</span> Good Issue & GR
+  </button>
+  <button class="tab-btn" onclick="switchTab('wo',this)">
+    <span class="tab-icon">🔧</span> Work Order
+  </button>
+  <button class="tab-btn" onclick="switchTab('items',this)">
+    <span class="tab-icon">🏆</span> Top Items
+  </button>
+</nav>
+
+<!-- ══════════════ PAGE: OVERVIEW ══════════════ -->
+<section id="page-overview" class="page active">
+
+  <div style="margin-bottom:20px"></div>
+
+  <!-- icon cards strip -->
+  <div class="icon-strip">
+    <div class="icon-card">
+      <!-- conveyor icon -->
+      <svg width="44" height="36" viewBox="0 0 44 36" fill="none">
+        <rect x="2" y="14" width="40" height="10" rx="3" fill="#E8610A" opacity=".15" stroke="#E8610A" stroke-width="1.5"/>
+        <circle cx="8" cy="19" r="5" fill="none" stroke="#E8610A" stroke-width="2"/>
+        <circle cx="8" cy="19" r="2" fill="#E8610A"/>
+        <circle cx="36" cy="19" r="5" fill="none" stroke="#E8610A" stroke-width="2"/>
+        <circle cx="36" cy="19" r="2" fill="#E8610A"/>
+        <rect x="14" y="8" width="9" height="7" rx="1.5" fill="#E8610A" opacity=".6"/>
+        <rect x="26" y="7" width="8" height="8" rx="1.5" fill="#E8610A" opacity=".4"/>
+      </svg>
+      <div class="icon-card-text">
+        <div class="label">Inventory Value</div>
+        <div class="val">4.09 B</div>
+        <div class="sub">IDR — Juni 2026</div>
+      </div>
+    </div>
+    <div class="icon-card">
+      <!-- chain sprocket -->
+      <svg width="44" height="36" viewBox="0 0 44 36" fill="none">
+        <circle cx="22" cy="18" r="12" fill="none" stroke="#0B8F7A" stroke-width="2"/>
+        <circle cx="22" cy="18" r="6" fill="none" stroke="#0B8F7A" stroke-width="1.5"/>
+        <circle cx="22" cy="18" r="2.5" fill="#0B8F7A"/>
+        <rect x="20" y="4" width="4" height="5" rx="1" fill="#0B8F7A"/>
+        <rect x="20" y="27" width="4" height="5" rx="1" fill="#0B8F7A"/>
+        <rect x="5" y="16" width="5" height="4" rx="1" fill="#0B8F7A"/>
+        <rect x="34" y="16" width="5" height="4" rx="1" fill="#0B8F7A"/>
+      </svg>
+      <div class="icon-card-text">
+        <div class="label">Total SKU Aktif</div>
+        <div class="val">1.831</div>
+        <div class="sub">Master Data item</div>
+      </div>
+    </div>
+    <div class="icon-card">
+      <!-- box on belt -->
+      <svg width="44" height="36" viewBox="0 0 44 36" fill="none">
+        <rect x="10" y="8" width="24" height="18" rx="2.5" fill="#1A6FC4" opacity=".15" stroke="#1A6FC4" stroke-width="1.5"/>
+        <line x1="10" y1="17" x2="34" y2="17" stroke="#1A6FC4" stroke-width="1.5"/>
+        <line x1="22" y1="8" x2="22" y2="26" stroke="#1A6FC4" stroke-width="1.5"/>
+        <path d="M4 29 Q22 33 40 29" stroke="#1A6FC4" stroke-width="1.5" fill="none" stroke-dasharray="4 2"/>
+      </svg>
+      <div class="icon-card-text">
+        <div class="label">Total GI YTD</div>
+        <div class="val">681 M</div>
+        <div class="sub">IDR barang keluar</div>
+      </div>
+    </div>
+    <div class="icon-card">
+      <!-- warehouse rack -->
+      <svg width="44" height="36" viewBox="0 0 44 36" fill="none">
+        <rect x="6" y="4" width="32" height="28" rx="2" fill="none" stroke="#C47B0A" stroke-width="1.5" opacity=".4"/>
+        <rect x="6" y="13" width="32" height="1.5" fill="#C47B0A" opacity=".5"/>
+        <rect x="6" y="22" width="32" height="1.5" fill="#C47B0A" opacity=".5"/>
+        <rect x="11" y="5" width="8" height="7" rx="1" fill="#C47B0A" opacity=".4"/>
+        <rect x="25" y="5" width="8" height="7" rx="1" fill="#C47B0A" opacity=".6"/>
+        <rect x="11" y="15" width="10" height="6" rx="1" fill="#C47B0A" opacity=".5"/>
+        <rect x="25" y="15" width="6" height="6" rx="1" fill="#C47B0A" opacity=".35"/>
+        <line x1="22" y1="4" x2="22" y2="32" stroke="#C47B0A" stroke-width="1.5" opacity=".3"/>
+      </svg>
+      <div class="icon-card-text">
+        <div class="label">Total GR YTD</div>
+        <div class="val">599 M</div>
+        <div class="sub">IDR barang masuk</div>
+      </div>
+    </div>
+    <div class="icon-card">
+      <!-- WO wrench gear -->
+      <svg width="44" height="36" viewBox="0 0 44 36" fill="none">
+        <circle cx="26" cy="18" r="8" fill="none" stroke="#D93636" stroke-width="2"/>
+        <circle cx="26" cy="18" r="3" fill="#D93636"/>
+        <path d="M12 10 L20 18 L12 26" stroke="#D93636" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <line x1="8" y1="18" x2="20" y2="18" stroke="#D93636" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div class="icon-card-text">
+        <div class="label">WO Closed YTD</div>
+        <div class="val">1.127</div>
+        <div class="sub">Work order selesai</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-hdr">
+    <div class="sec-dot"></div>
+    <span class="sec-title">KPI Utama — Semester I 2026</span>
+    <span class="sec-sub">PT. Rantai Mulia Kencana (RMK)</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card orange">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top">
+        <div class="kpi-label">Inventory Value</div>
+        <div class="kpi-ico">🏗️</div>
+      </div>
+      <div class="kpi-value">4.09 B</div>
+      <div class="kpi-desc">IDR Total Cost SOH · Juni 2026</div>
+      <div class="kpi-badge amber">⟶ Stabil</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top">
+        <div class="kpi-label">Total SKU</div>
+        <div class="kpi-ico">📋</div>
+      </div>
+      <div class="kpi-value">1.831</div>
+      <div class="kpi-desc">Part number terdaftar</div>
+      <div class="kpi-badge blue">Aktif</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top">
+        <div class="kpi-label">Item Berstock</div>
+        <div class="kpi-ico">📦</div>
+      </div>
+      <div class="kpi-value">1.441</div>
+      <div class="kpi-desc">SOH > 0 · 78.7% dari master</div>
+      <div class="kpi-badge green">✓ Tersedia</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top">
+        <div class="kpi-label">Item Ada Harga</div>
+        <div class="kpi-ico">💰</div>
+      </div>
+      <div class="kpi-value">50</div>
+      <div class="kpi-desc">dari 1.831 SKU (2.7%)</div>
+      <div class="kpi-badge orange">⚠ Perlu update</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top">
+        <div class="kpi-label">Good Issue YTD</div>
+        <div class="kpi-ico">⬆️</div>
+      </div>
+      <div class="kpi-value">681 M</div>
+      <div class="kpi-desc">IDR · 1.357 transaksi</div>
+      <div class="kpi-badge red">Keluar</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top">
+        <div class="kpi-label">Good Received YTD</div>
+        <div class="kpi-ico">⬇️</div>
+      </div>
+      <div class="kpi-value">599 M</div>
+      <div class="kpi-desc">IDR · 1.016 transaksi</div>
+      <div class="kpi-badge green">Masuk</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top">
+        <div class="kpi-label">Avg. ITO Ratio</div>
+        <div class="kpi-ico">🔄</div>
+      </div>
+      <div class="kpi-value">0.33×</div>
+      <div class="kpi-desc">Target: 3.0× per bulan</div>
+      <div class="kpi-badge red">↓ Di bawah target</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top">
+        <div class="kpi-label">WO Closed YTD</div>
+        <div class="kpi-ico">🔧</div>
+      </div>
+      <div class="kpi-value">1.127</div>
+      <div class="kpi-desc">Work order selesai disuplai</div>
+      <div class="kpi-badge green">✓ Diselesaikan</div>
+    </div>
+  </div>
+
+  <div class="sec-hdr">
+    <div class="sec-dot"></div>
+    <span class="sec-title">Tren Bulanan</span>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card full">
+      <div class="chart-head">
+        <div class="chart-title">Good Issue vs Good Received per Bulan (IDR)</div>
+        <div class="chart-desc">Perbandingan nilai barang keluar dan masuk Januari–Juni 2026</div>
+      </div>
+      <div class="chart-wrap tall">
+        <canvas id="chartGIvsGR"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">Inventory Turnover Ratio (ITO)</div>
+        <div class="chart-desc">Aktual vs target 3× per bulan</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartITO"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">Distribusi Status Item</div>
+        <div class="chart-desc">Komposisi inventaris berdasarkan status</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartItemDist"></canvas>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════════ PAGE: INVENTORY ══════════════ -->
+<section id="page-inventory" class="page">
+  <div style="margin-bottom:20px"></div>
+
+  <div class="sec-hdr">
+    <div class="sec-dot"></div>
+    <span class="sec-title">Status Stok On Hand (SOH) — Juni 2026</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card orange">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Total Nilai SOH</div><div class="kpi-ico">🏗️</div></div>
+      <div class="kpi-value">4.09 B</div>
+      <div class="kpi-desc">IDR total cost inventaris</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Item Aktif</div><div class="kpi-ico">✅</div></div>
+      <div class="kpi-value">1.446</div>
+      <div class="kpi-desc">SKU dengan stok qty > 0</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Item Tanpa Max/Min</div><div class="kpi-ico">⚠️</div></div>
+      <div class="kpi-value">1.441</div>
+      <div class="kpi-desc">Belum ada batas level stok</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Fast Moving</div><div class="kpi-ico">🚀</div></div>
+      <div class="kpi-value">63</div>
+      <div class="kpi-desc">Item aktif bergerak cepat</div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">Klasifikasi Pergerakan Item</div>
+        <div class="chart-desc">Fast Moving / Slow Moving / Dead Stock</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartMoving"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">Komposisi SOH vs Master Data</div>
+        <div class="chart-desc">% item berstock dari total SKU terdaftar</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartSOHComp"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-hdr">
+    <div class="sec-dot"></div>
+    <span class="sec-title">Top 10 Item — Qty Tertinggi di Gudang</span>
+  </div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Deskripsi Item</th>
+            <th>Qty On Hand</th>
+            <th>Satuan</th>
+            <th>Status Level</th>
+          </tr>
+        </thead>
+        <tbody id="soh-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ PAGE: MOVEMENT ══════════════ -->
+<section id="page-movement" class="page">
+  <div style="margin-bottom:20px"></div>
+
+  <div class="sec-hdr">
+    <div class="sec-dot"></div>
+    <span class="sec-title">Good Issue & Good Received — Jan s/d Jun 2026</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card red">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Total Nilai GI</div><div class="kpi-ico">📤</div></div>
+      <div class="kpi-value">681 M</div>
+      <div class="kpi-desc">IDR — 6 bulan kumulatif</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Total Nilai GR</div><div class="kpi-ico">📥</div></div>
+      <div class="kpi-value">599 M</div>
+      <div class="kpi-desc">IDR — 6 bulan kumulatif</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Selisih GI - GR</div><div class="kpi-ico">⚖️</div></div>
+      <div class="kpi-value">+81 M</div>
+      <div class="kpi-desc">Net outflow — GI lebih besar</div>
+      <div class="kpi-badge orange">⚠ Perhatian</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Rata-rata GI/bulan</div><div class="kpi-ico">📊</div></div>
+      <div class="kpi-value">113 M</div>
+      <div class="kpi-desc">IDR rata-rata per bulan</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Transaksi GI</div><div class="kpi-ico">🔢</div></div>
+      <div class="kpi-value">1.357</div>
+      <div class="kpi-desc">Pick list diproses</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Transaksi GR</div><div class="kpi-ico">🔢</div></div>
+      <div class="kpi-value">1.016</div>
+      <div class="kpi-desc">Penerimaan diproses</div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">Nilai Good Issue per Bulan</div>
+        <div class="chart-desc">Nilai barang keluar (IDR)</div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartGIMonthly"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">Nilai Good Received per Bulan</div>
+        <div class="chart-desc">Nilai barang masuk (IDR)</div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartGRMonthly"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">Volume Transaksi per Bulan</div>
+        <div class="chart-desc">Jumlah item GI vs GR</div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartVolume"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">Net Flow (GI − GR) per Bulan</div>
+        <div class="chart-desc">Merah = GI > GR (outflow), Hijau = GR > GI (inflow)</div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartNetFlow"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ PAGE: WORK ORDER ══════════════ -->
+<section id="page-wo" class="page">
+  <div style="margin-bottom:20px"></div>
+
+  <div class="sec-hdr">
+    <div class="sec-dot"></div>
+    <span class="sec-title">Kinerja Work Order Supply — Jan s/d Jun 2026</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card teal">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Total WO Closed</div><div class="kpi-ico">✅</div></div>
+      <div class="kpi-value">1.127</div>
+      <div class="kpi-desc">Work order berhasil disuplai</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Target WO ≤ 4 Hari</div><div class="kpi-ico">🎯</div></div>
+      <div class="kpi-value">70%</div>
+      <div class="kpi-desc">Benchmark respon cepat</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">Avg. Suplai Juni</div><div class="kpi-ico">⏱️</div></div>
+      <div class="kpi-value">17.9 hr</div>
+      <div class="kpi-desc">Hari rata-rata — naik signifikan</div>
+      <div class="kpi-badge red">↑ Perlu perhatian</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-card-accent"></div>
+      <div class="kpi-top"><div class="kpi-label">WO Juni > 10 Hari</div><div class="kpi-ico">⚠️</div></div>
+      <div class="kpi-value">9.4%</div>
+      <div class="kpi-desc">Melewati batas 10 hari</div>
+      <div class="kpi-badge red">⚠ Monitor</div>
+    </div>
+  </div>
+
+  <div class="sec-hdr">
+    <div class="sec-dot"></div>
+    <span class="sec-title">Pencapaian Target ≤ 4 Hari per Bulan</span>
+  </div>
+
+  <div class="gauge-grid" id="gauge-grid"></div>
+
+  <div class="chart-grid">
+    <div class="chart-card full">
+      <div class="chart-head">
+        <div class="chart-title">Distribusi Waktu Suplai WO per Bulan (%)</div>
+        <div class="chart-desc">Persentase WO berdasarkan lama suplai vs target 70% selesai dalam ≤ 4 hari</div>
+      </div>
+      <div class="chart-wrap tall">
+        <canvas id="chartWODist"></canvas>
+      </div>
+    </div>
+    <div class="chart-card full">
+      <div class="chart-head">
+        <div class="chart-title">Jumlah WO Closed per Bulan</div>
+        <div class="chart-desc">Total work order yang berhasil disuplai</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartWOClosed"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ PAGE: TOP ITEMS ══════════════ -->
+<section id="page-items" class="page">
+  <div style="margin-bottom:20px"></div>
+
+  <div class="sec-hdr">
+    <div class="sec-dot"></div>
+    <span class="sec-title">Top 10 Item Berdasarkan Nilai Good Issue — Jan s/d Jun 2026</span>
+  </div>
+
+  <!-- Full-name table first -->
+  <div class="tbl-wrap" style="margin-bottom:28px">
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Kode / Deskripsi Item Lengkap</th>
+            <th>Nilai GI (IDR)</th>
+            <th>Proporsi</th>
+            <th>Kategori</th>
+          </tr>
+        </thead>
+        <tbody id="top-items-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sec-hdr">
+    <div class="sec-dot"></div>
+    <span class="sec-title">Proporsi Nilai GI — Visualisasi</span>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card full">
+      <div class="chart-head">
+        <div class="chart-title">Top 10 Item — Nilai Good Issue Tertinggi (IDR)</div>
+        <div class="chart-desc">Akumulasi Januari–Juni 2026 · Label nama lengkap</div>
+      </div>
+      <div class="chart-wrap xtall">
+        <canvas id="chartTopItems"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-hdr">
+    <div class="sec-dot"></div>
+    <span class="sec-title">Progress Bar — Persentase dari Total GI Top 10</span>
+  </div>
+
+  <div class="chart-card">
+    <div id="prog-container"></div>
+  </div>
+
+</section>
+
+<script>
+// ─── RAW DATA ───
+const months      = ['January','Febuary','Maret','April','May','June'];
+const monthsShort = ['Jan','Feb','Mar','Apr','Mei','Jun'];
+
+const giValues  = [135010198, 142820399, 78146634, 165478564, 66096431, 93628967];
+const grValues  = [178472521, 76047948,  70855489, 158734414, 74631930, 40946199];
+const giItems   = [241, 244, 174, 274, 199, 225];
+const grItems   = [238, 100, 131, 212, 196, 139];
+const itoRatio  = [0.3956, 0.4185, 0.2290, 0.4849, 0.1937, 0.2744];
+
+const woClosed   = [215, 183, 140, 271, 181, 137];
+const wo14days   = [0.8958, 0.7787, 0.8046, 0.9891, 0.9095, 0.7611];
+const wo510days  = [0.1042, 0.1787, 0.1839, 0.0109, 0.1444, 0.1013];
+const wo1130days = [0.0000, 0.0425, 0.0115, 0.0000, 0.0000, 0.0944];
+
+const topItems = [
+  { code:'RS-C2042-SS-DS',   name:'ROLLER CHAIN C2042 STAINLESS STEEL DAICHAIN',              val:151900000 },
+  { code:'RS140-1R-DS',      name:'ROLLER CHAIN RS140 - 1R DAICHAIN',                          val:92800000  },
+  { code:'OSC-SS568H-DS',    name:'OFFSET SIDEBAR CHAIN SS 568-H DAICHAIN',                    val:31500000  },
+  { code:'DS-3100R-A2-DS',   name:'CONVEYOR CHAIN DS-3100-R-A2 EVERY LINK DAICHAIN',           val:31050000  },
+  { code:'RS-C2060-BA1-DS',  name:'DOUBLE PITCH CHAIN C2060 BA1 EVERY LINK DAICHAIN',          val:28800000  },
+  { code:'08-09022',         name:'SPROCKET FOR DRIVER ROLLER YELLOW SPROCKET 08B-2R 14T',     val:27075000  },
+  { code:'DS-5100R',         name:'CONVEYOR CHAIN DS 5100-R',                                   val:22700000  },
+  { code:'RS-C2100-BA2-DS',  name:'DOUBLE PITCH CHAIN C2100 BA2 EVERY LINK DAICHAIN',          val:21725000  },
+  { code:'RS80X20T',         name:'SPROCKET RS80-2R X 20 TEETH',                               val:20300000  },
+  { code:'RS80X28T',         name:'SPROCKET RS80-2R X 28 TEETH',                               val:20239000  },
+];
+
+const sohTop = [
+  { desc:'CONNECTING LINK 35-1R',                                 qty:4850, unit:'PCS' },
+  { desc:'KANCING MODULAR BELT 550 K35',                          qty:4500, unit:'PCS' },
+  { desc:'CONNECTING LINK 06B-2',                                 qty:4472, unit:'PCS' },
+  { desc:'CONNECTING LINK RS08B-1R',                              qty:3926, unit:'PCS' },
+  { desc:'CONNECTING LINK 35-2R',                                 qty:2946, unit:'PCS' },
+  { desc:'SPROCKET FOR DRIVER ROLLER YELLOW 08B-2R 14T',         qty:1500, unit:'PCS' },
+  { desc:'ROLLER CHAIN RS40-1R STAINLESS STEEL DAICHAIN',        qty:850,  unit:'ROL' },
+  { desc:'CONNECTING LINK 40-2 SS RATA',                          qty:650,  unit:'PCS' },
+  { desc:'TABLE TOP CHAIN SSE 881 TAB K325',                      qty:430,  unit:'ROL' },
+  { desc:'SPROCKET RS40 X 18 TEETH',                              qty:350,  unit:'PCS' },
+];
+
+// ─── COLORS ───
+const CLR = {
+  orange:  '#E8610A',
+  teal:    '#0B8F7A',
+  blue:    '#1A6FC4',
+  red:     '#D93636',
+  amber:   '#C47B0A',
+  orangeA: 'rgba(232,97,10,0.75)',
+  tealA:   'rgba(11,143,122,0.75)',
+  blueA:   'rgba(26,111,196,0.75)',
+  redA:    'rgba(217,54,54,0.75)',
+  grid:    'rgba(27,58,92,0.08)',
+  font:    '#3D5570',
+};
+
+Chart.defaults.color = CLR.font;
+Chart.defaults.font.family = 'Plus Jakarta Sans';
+
+function fmt(n){
+  if(n>=1e9) return (n/1e9).toFixed(2)+' B';
+  if(n>=1e6) return (n/1e6).toFixed(1)+' M';
+  if(n>=1e3) return (n/1e3).toFixed(0)+' K';
+  return n;
+}
+function fmtIDR(n){
+  return 'Rp ' + n.toLocaleString('id-ID');
+}
+
+const scalesLight = {
+  x:{ grid:{ color:CLR.grid, drawBorder:false } },
+  y:{ grid:{ color:CLR.grid, drawBorder:false }, ticks:{ callback: v => fmt(v) } }
+};
+const scalesLightPct = {
+  x:{ grid:{ color:CLR.grid }, stacked:true },
+  y:{ grid:{ color:CLR.grid }, stacked:true, max:120, ticks:{ callback: v => v+'%' } }
+};
+
+function mk(id, cfg){
+  const ctx = document.getElementById(id);
+  if(!ctx) return;
+  return new Chart(ctx.getContext('2d'), cfg);
+}
+
+// ══ OVERVIEW ══
+function buildOverview(){
+  mk('chartGIvsGR',{
+    type:'bar',
+    data:{
+      labels:monthsShort,
+      datasets:[
+        { label:'Good Issue', data:giValues, backgroundColor:CLR.redA, borderColor:CLR.red, borderWidth:1, borderRadius:6 },
+        { label:'Good Received', data:grValues, backgroundColor:CLR.tealA, borderColor:CLR.teal, borderWidth:1, borderRadius:6 },
+      ]
+    },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ boxWidth:14 } } },
+      scales: scalesLight
+    }
+  });
+
+  mk('chartITO',{
+    type:'line',
+    data:{
+      labels:monthsShort,
+      datasets:[
+        { label:'ITO Ratio', data:itoRatio, borderColor:CLR.blue, backgroundColor:'rgba(26,111,196,0.10)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:CLR.blue },
+        { label:'Target (3×)', data:Array(6).fill(3), borderColor:CLR.orange, borderDash:[6,4], pointRadius:0, fill:false, borderWidth:2 }
+      ]
+    },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ boxWidth:14 } } },
+      scales:{ x:{ grid:{ color:CLR.grid } }, y:{ grid:{ color:CLR.grid }, min:0, max:3.5 } }
+    }
+  });
+
+  mk('chartItemDist',{
+    type:'doughnut',
+    data:{
+      labels:['Berstock (SOH>0)','Belum Harga','Ada Harga','Tanpa Stok'],
+      datasets:[{
+        data:[1441, 1441, 50, 390],
+        backgroundColor:['rgba(11,143,122,.7)','rgba(196,123,10,.7)','rgba(26,111,196,.7)','rgba(150,170,190,.5)'],
+        borderColor:['#0B8F7A','#C47B0A','#1A6FC4','#aab9cc'],
+        borderWidth:2,
+      }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'60%',
+      plugins:{ legend:{ position:'right', labels:{ boxWidth:12, padding:14, font:{size:11} } } }
+    }
+  });
+}
+
+// ══ INVENTORY ══
+function buildInventory(){
+  mk('chartMoving',{
+    type:'bar',
+    data:{
+      labels:['Fast Moving','Slow Moving','Dead Stock'],
+      datasets:[{ data:[63, 1278, 490],
+        backgroundColor:[CLR.tealA, CLR.orangeA, CLR.redA],
+        borderColor:[CLR.teal, CLR.orange, CLR.red],
+        borderWidth:1, borderRadius:8,
+      }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ x:{ grid:{ color:CLR.grid } }, y:{ grid:{ color:CLR.grid } } }
+    }
+  });
+
+  mk('chartSOHComp',{
+    type:'doughnut',
+    data:{
+      labels:['Berstock (1.446)','Tanpa Stok (385)'],
+      datasets:[{
+        data:[1446, 385],
+        backgroundColor:['rgba(26,111,196,.75)','rgba(150,170,190,.35)'],
+        borderColor:['#1A6FC4','#cdd8e3'],
+        borderWidth:2,
+      }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'65%',
+      plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, font:{size:11} } } }
+    }
+  });
+
+  const tbody = document.getElementById('soh-tbody');
+  sohTop.forEach((item, i) => {
+    const pill = i < 3 ? '<span class="pill pill-red">🔴 Tinggi</span>'
+                : i < 7 ? '<span class="pill pill-orange">🟡 Sedang</span>'
+                :          '<span class="pill pill-blue">🔵 Normal</span>';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${i+1}</strong></td>
+      <td>${item.desc}</td>
+      <td class="mono"><strong>${item.qty.toLocaleString('id-ID')}</strong></td>
+      <td>${item.unit}</td>
+      <td>${pill}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ══ MOVEMENT ══
+function buildMovement(){
+  const bOpt = {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ display:false } },
+    scales: scalesLight
+  };
+  mk('chartGIMonthly',{
+    type:'bar',
+    data:{ labels:monthsShort, datasets:[{ label:'GI', data:giValues, backgroundColor:CLR.redA, borderColor:CLR.red, borderWidth:1, borderRadius:6 }] },
+    options: bOpt
+  });
+  mk('chartGRMonthly',{
+    type:'bar',
+    data:{ labels:monthsShort, datasets:[{ label:'GR', data:grValues, backgroundColor:CLR.tealA, borderColor:CLR.teal, borderWidth:1, borderRadius:6 }] },
+    options: bOpt
+  });
+  mk('chartVolume',{
+    type:'line',
+    data:{ labels:monthsShort, datasets:[
+      { label:'GI Items', data:giItems, borderColor:CLR.red, backgroundColor:'rgba(217,54,54,.10)', fill:true, tension:0.4, pointRadius:4 },
+      { label:'GR Items', data:grItems, borderColor:CLR.teal, backgroundColor:'rgba(11,143,122,.10)', fill:true, tension:0.4, pointRadius:4 },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ boxWidth:12 } } },
+      scales:{ x:{ grid:{ color:CLR.grid } }, y:{ grid:{ color:CLR.grid } } }
+    }
+  });
+  const netFlow = giValues.map((v,i) => v - grValues[i]);
+  mk('chartNetFlow',{
+    type:'bar',
+    data:{ labels:monthsShort, datasets:[{
+      label:'Net Flow',
+      data:netFlow,
+      backgroundColor: netFlow.map(v => v>0 ? CLR.redA : CLR.tealA),
+      borderColor:     netFlow.map(v => v>0 ? CLR.red  : CLR.teal),
+      borderWidth:1, borderRadius:6,
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ x:{ grid:{ color:CLR.grid } }, y:{ grid:{ color:CLR.grid }, ticks:{ callback: v=>fmt(v) } } }
+    }
+  });
+}
+
+// ══ WORK ORDER ══
+function buildWO(){
+  const gaugeGrid = document.getElementById('gauge-grid');
+  monthsShort.forEach((m,i) => {
+    const pct = wo14days[i];
+    const hit = pct >= 0.70;
+    const col = hit ? '#0B8F7A' : pct >= 0.75 ? '#C47B0A' : '#D93636';
+    const r=35, circ=2*Math.PI*r, offset=circ*(1-pct);
+    const div=document.createElement('div');
+    div.className='gauge-box';
+    div.innerHTML=`
+      <div class="gauge-month">${months[i]}</div>
+      <div class="gauge-ring">
+        <svg viewBox="0 0 80 80" width="80" height="80">
+          <circle cx="40" cy="40" r="${r}" fill="none" stroke="#E4ECF4" stroke-width="7"/>
+          <circle cx="40" cy="40" r="${r}" fill="none" stroke="${col}" stroke-width="7"
+            stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"
+            stroke-linecap="round"/>
+        </svg>
+        <div class="gauge-pct" style="color:${col}">${(pct*100).toFixed(1)}%</div>
+      </div>
+      <div class="gauge-lbl">WO ≤ 4 hari</div>
+      <div>${hit?'<span class="pill pill-green">✓ Tercapai</span>':'<span class="pill pill-red">✗ Miss</span>'}</div>
+      <div style="font-size:10px;color:var(--text-3);margin-top:6px">${woClosed[i]} WO closed</div>`;
+    gaugeGrid.appendChild(div);
+  });
+
+  mk('chartWODist',{
+    type:'bar',
+    data:{ labels:monthsShort, datasets:[
+      { label:'1–4 Hari', data:wo14days.map(v=>+(v*100).toFixed(1)), backgroundColor:'rgba(11,143,122,.75)', borderRadius:{topLeft:4,topRight:4} },
+      { label:'5–10 Hari', data:wo510days.map(v=>+(v*100).toFixed(1)), backgroundColor:'rgba(196,123,10,.75)' },
+      { label:'11–30 Hari', data:wo1130days.map(v=>+(v*100).toFixed(1)), backgroundColor:'rgba(217,54,54,.75)' },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ boxWidth:14 } } },
+      scales: scalesLightPct
+    }
+  });
+
+  mk('chartWOClosed',{
+    type:'bar',
+    data:{ labels:monthsShort, datasets:[{ label:'WO Closed', data:woClosed, backgroundColor:CLR.blueA, borderColor:CLR.blue, borderWidth:1, borderRadius:6 }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ x:{ grid:{ color:CLR.grid } }, y:{ grid:{ color:CLR.grid } } }
+    }
+  });
+}
+
+// ══ TOP ITEMS ══
+function buildItems(){
+  const total = topItems.reduce((a,b)=>a+b.val,0);
+
+  // Table with FULL names
+  const tbody = document.getElementById('top-items-tbody');
+  topItems.forEach((item,i) => {
+    const pct = ((item.val/total)*100).toFixed(1);
+    const cat = i===0 ? '<span class="pill pill-red">🔥 Tertinggi</span>'
+              : i<3   ? '<span class="pill pill-orange">⚡ Top 3</span>'
+              :          '<span class="pill pill-blue">📦 Regular</span>';
+    const rankStyle = i<3 ? 'background:var(--orange);color:#fff;font-weight:800' : '';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;background:var(--bg);font-weight:700;font-size:12px;${rankStyle}">${i+1}</span></td>
+      <td>
+        <div style="font-weight:600;color:var(--text-1);margin-bottom:2px">${item.name}</div>
+        <div style="font-size:10px;color:var(--text-3);font-family:'JetBrains Mono',monospace">${item.code}</div>
+      </td>
+      <td class="mono" style="color:var(--orange);font-weight:700">${fmtIDR(item.val)}</td>
+      <td class="mono">${pct}%</td>
+      <td>${cat}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Horizontal bar chart — full name labels
+  mk('chartTopItems',{
+    type:'bar',
+    data:{
+      labels: topItems.map(i => i.name),
+      datasets:[{
+        label:'Nilai GI (IDR)',
+        data: topItems.map(i=>i.val),
+        backgroundColor: topItems.map((_,i) => i===0 ? CLR.orange : i<3 ? CLR.orangeA : CLR.blueA),
+        borderColor:     topItems.map((_,i) => i<3 ? CLR.orange : CLR.blue),
+        borderWidth:1,
+        borderRadius:6,
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false }, tooltip:{
+        callbacks:{ label: ctx => '  '+fmtIDR(ctx.raw) }
+      }},
+      scales:{
+        x:{ grid:{ color:CLR.grid }, ticks:{ callback:v=>fmt(v) } },
+        y:{ grid:{ color:CLR.grid }, ticks:{ font:{ size:12 }, color:'#0F2133' } },
+      }
+    }
+  });
+
+  // Progress bars
+  const prog = document.getElementById('prog-container');
+  topItems.forEach((item,i) => {
+    const pct = (item.val/total)*100;
+    const isTop = i<3;
+    const div = document.createElement('div');
+    div.className = 'prog-row';
+    div.innerHTML=`
+      <div class="prog-rank ${isTop?'top'}">${i+1}</div>
+      <div class="prog-name">
+        <div style="font-weight:600">${item.name}</div>
+        <div style="font-size:10px;color:var(--text-3);font-family:'JetBrains Mono',monospace">${item.code} · ${fmtIDR(item.val)}</div>
+      </div>
+      <div class="prog-bar-wrap">
+        <div class="prog-track">
+          <div class="prog-fill" style="width:${pct}%;background:${isTop?'var(--orange)':'var(--blue)'}"></div>
+        </div>
+      </div>
+      <div class="prog-val">${pct.toFixed(1)}%</div>`;
+    prog.appendChild(div);
+  });
+}
+
+// ─── TAB SWITCH ───
+const built = {};
+function switchTab(tab, btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('page-'+tab).classList.add('active');
+  if(!built[tab]){
+    built[tab]=true;
+    if(tab==='overview')  buildOverview();
+    if(tab==='inventory') buildInventory();
+    if(tab==='movement')  buildMovement();
+    if(tab==='wo')        buildWO();
+    if(tab==='items')     buildItems();
+  }
+}
+
+// ─── INIT ───
+buildOverview();
+built.overview = true;
+</script>
+</body>
+</html>
