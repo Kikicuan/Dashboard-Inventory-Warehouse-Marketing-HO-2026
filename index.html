@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PT. Rantai Mulia Kencana — KPI Dashboard 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sw: 256px;
+  --hh: 64px;
+  --r:  12px;
+  --r2: 8px;
+  --primary:    #1B3F7A;
+  --primary-2:  #2455A4;
+  --accent:     #E8610A;
+  --accent-lt:  #FFF0E6;
+  --success:    #16A34A;
+  --success-lt: #DCFCE7;
+  --warning:    #D97706;
+  --warning-lt: #FEF3C7;
+  --danger:     #DC2626;
+  --danger-lt:  #FEE2E2;
+  --info:       #0891B2;
+  --info-lt:    #CFFAFE;
+  --purple:     #7C3AED;
+  --purple-lt:  #EDE9FE;
+  --bg:         #F3F6FA;
+  --surface:    #FFFFFF;
+  --sidebar-bg: #0F2240;
+  --border:     #E2E8F0;
+  --text-1:     #0F172A;
+  --text-2:     #374151;
+  --text-3:     #64748B;
+  --text-4:     #94A3B8;
+  --sh1: 0 1px 3px rgba(15,34,64,.07),0 1px 2px rgba(15,34,64,.05);
+  --sh2: 0 4px 16px rgba(15,34,64,.08),0 2px 6px rgba(15,34,64,.05);
+  --sh3: 0 10px 32px rgba(15,34,64,.10),0 4px 8px rgba(15,34,64,.06);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min-height:100vh;display:flex;overflow-x:hidden}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:99px}
+
+/* ══ SIDEBAR ══ */
+.sidebar{
+  width:var(--sw);min-height:100vh;background:var(--sidebar-bg);
+  display:flex;flex-direction:column;
+  position:fixed;left:0;top:0;bottom:0;z-index:200;
+  overflow-y:auto;overflow-x:hidden;
+  transition:transform .28s ease;
+}
+
+/* Logo brand area */
+.sb-brand{
+  padding:0 0 16px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.sb-logo-wrap{
+  display:flex;align-items:center;justify-content:center;
+  padding:20px 20px 14px;
+}
+.sb-logo-img{
+  height:42px;width:auto;max-width:160px;object-fit:contain;
+  filter:brightness(0) invert(1);
+  transition:opacity .2s;
+}
+.sb-logo-img:hover{opacity:.85}
+.sb-logo-fallback{
+  display:none;align-items:center;gap:10px;padding:0 20px;
+}
+.sb-logo-icon{
+  width:40px;height:40px;
+  background:var(--accent);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.sb-brand-text{font-size:13px;font-weight:700;color:#fff;line-height:1.3}
+.sb-brand-sub {font-size:10px;color:rgba(148,163,184,.7)}
+.sb-divider-info{
+  margin:0 16px;padding:10px 12px;
+  border:1px solid rgba(255,255,255,.08);border-radius:8px;
+  background:rgba(255,255,255,.04);
+}
+.sb-divider-info p{font-size:10px;color:rgba(148,163,184,.65);line-height:1.6}
+.sb-divider-info strong{color:rgba(203,213,225,.85);font-weight:600}
+
+/* Nav */
+.sb-section{
+  padding:16px 20px 4px;
+  font-size:9.5px;font-weight:700;letter-spacing:.11em;
+  text-transform:uppercase;color:rgba(148,163,184,.4);
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;margin:2px 10px;
+  border-radius:var(--r2);cursor:pointer;
+  color:rgba(148,163,184,.8);font-size:13px;font-weight:500;
+  transition:background .15s,color .15s;text-decoration:none;
+}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#e2e8f0}
+.nav-item.active{
+  background:rgba(232,97,10,.18);
+  color:#fff;border-left:3px solid var(--accent);
+  padding-left:11px;
+}
+.nav-item.active .nav-icon{color:var(--accent)}
+.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.nav-badge{
+  margin-left:auto;background:var(--accent);color:#fff;
+  font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:99px;
+}
+
+/* Sidebar bottom */
+.sb-bottom{margin-top:auto;border-top:1px solid rgba(255,255,255,.07);padding:14px 14px}
+.sb-profile{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:var(--r2);cursor:pointer;
+  transition:background .15s;
+}
+.sb-profile:hover{background:rgba(255,255,255,.07)}
+.sb-avatar{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary-2),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:13px;flex-shrink:0;
+}
+.sb-profile-name{font-size:12px;font-weight:600;color:#e2e8f0}
+.sb-profile-role{font-size:10px;color:rgba(148,163,184,.7)}
+
+/* ══ MAIN ══ */
+.main{flex:1;margin-left:var(--sw);display:flex;flex-direction:column;min-height:100vh}
+
+/* TOPBAR */
+.topbar{
+  height:var(--hh);background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;
+  position:sticky;top:0;z-index:100;gap:14px;box-shadow:var(--sh1);
+}
+.hamburger{
+  display:none;width:36px;height:36px;border:1px solid var(--border);
+  border-radius:var(--r2);background:var(--surface);
+  align-items:center;justify-content:center;cursor:pointer;font-size:17px;
+}
+/* Topbar logo */
+.topbar-logo{
+  height:30px;width:auto;max-width:100px;object-fit:contain;
+}
+.topbar-divider{width:1px;height:28px;background:var(--border)}
+.topbar-info{flex:1}
+.topbar-title{font-size:15px;font-weight:700;color:var(--text-1)}
+.topbar-sub  {font-size:11px;color:var(--text-3);margin-top:1px}
+.topbar-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 13px;border-radius:var(--r2);
+  font-size:11.5px;font-weight:600;
+}
+.tp-period{background:#EEF3FF;border:1px solid rgba(27,63,122,.18);color:var(--primary)}
+.tp-live  {background:var(--success-lt);border:1px solid rgba(22,163,74,.2);color:var(--success)}
+.live-dot {width:7px;height:7px;border-radius:50%;background:var(--success);animation:lp 2s infinite}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
+.topbar-btn{
+  width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r2);
+  background:var(--surface);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:15px;color:var(--text-3);transition:all .15s;
+}
+.topbar-btn:hover{background:var(--bg);border-color:#CBD5E1}
+
+/* ══ CONTENT ══ */
+.content{padding:24px;flex:1}
+.page{display:none}
+.page.active{display:block}
+
+/* Page header */
+.pg-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px}
+.pg-title{font-size:20px;font-weight:800;color:var(--text-1)}
+.pg-sub{font-size:12px;color:var(--text-3);margin-top:3px}
+
+/* ══ HERO BANNER ══ */
+.hero-banner{
+  position:relative;overflow:hidden;
+  border-radius:var(--r);margin-bottom:24px;
+  min-height:190px;
+}
+.hero-bg-photo{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(105deg,
+    rgba(15,34,64,.97)  0%,
+    rgba(27,63,122,.90) 45%,
+    rgba(27,63,122,.65) 100%);
+}
+.hero-content{
+  position:relative;z-index:2;
+  padding:28px 32px;
+  display:flex;align-items:center;gap:28px;
+}
+.hero-logo-badge{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  flex-shrink:0;
+}
+.hero-logo-img{
+  height:52px;width:auto;max-width:160px;object-fit:contain;
+  filter:brightness(0) invert(1);
+}
+.hero-logo-sub{font-size:9px;color:rgba(255,255,255,.5);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;font-weight:500}
+.hero-divider{width:1px;height:80px;background:rgba(255,255,255,.15);flex-shrink:0}
+.hero-body{flex:1}
+.hero-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.hero-title{font-size:22px;font-weight:800;color:#fff;line-height:1.25;margin-bottom:7px}
+.hero-desc{font-size:12.5px;color:rgba(255,255,255,.58)}
+.hero-stats{display:flex;gap:24px;margin-top:16px;flex-wrap:wrap}
+.hero-stat-val{font-size:20px;font-weight:800;color:#fff;font-family:'JetBrains Mono',monospace;line-height:1}
+.hero-stat-lbl{font-size:10px;color:rgba(255,255,255,.48);margin-top:3px;font-weight:500}
+.hero-illus{flex-shrink:0;opacity:.88}
+
+/* ══ PHOTO GRID ══ */
+.photo-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:10px;margin-bottom:24px;
+}
+.photo-thumb{
+  height:90px;border-radius:var(--r2);overflow:hidden;
+  position:relative;cursor:pointer;
+  background:#1B3F7A;
+}
+.photo-thumb img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .35s ease;display:block;
+}
+.photo-thumb:hover img{transform:scale(1.06)}
+.photo-thumb-label{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:6px 10px;
+  background:linear-gradient(transparent,rgba(15,34,64,.82));
+  font-size:10px;font-weight:600;color:#fff;
+  letter-spacing:.04em;text-transform:uppercase;
+}
+/* fallback: colored bg if image fails */
+.photo-thumb.f1{background:linear-gradient(135deg,#1B3F7A,#2455A4)}
+.photo-thumb.f2{background:linear-gradient(135deg,#164E63,#0891B2)}
+.photo-thumb.f3{background:linear-gradient(135deg,#3B0764,#7C3AED)}
+.photo-thumb.f4{background:linear-gradient(135deg,#431407,#E8610A)}
+
+/* ══ STAT CARDS ══ */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:14px;margin-bottom:22px}
+.stat-card{
+  background:var(--surface);border-radius:var(--r);
+  border:1px solid var(--border);padding:20px;
+  box-shadow:var(--sh1);
+  position:relative;overflow:hidden;
+  transition:box-shadow .2s,transform .2s;
+}
+.stat-card:hover{box-shadow:var(--sh2);transform:translateY(-1px)}
+.stat-card::after{
+  content:'';position:absolute;top:0;left:0;
+  width:100%;height:3.5px;border-radius:var(--r) var(--r) 0 0;
+}
+.stat-card.c-blue::after  {background:var(--primary)}
+.stat-card.c-green::after {background:var(--success)}
+.stat-card.c-red::after   {background:var(--danger)}
+.stat-card.c-orange::after{background:var(--accent)}
+.stat-card.c-amber::after {background:var(--warning)}
+.stat-card.c-purple::after{background:var(--purple)}
+.stat-card.c-cyan::after  {background:var(--info)}
+
+.stat-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.stat-icon{
+  width:44px;height:44px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.i-blue  {background:#EEF3FF}
+.i-green {background:var(--success-lt)}
+.i-red   {background:var(--danger-lt)}
+.i-orange{background:var(--accent-lt)}
+.i-amber {background:var(--warning-lt)}
+.i-purple{background:var(--purple-lt)}
+.i-cyan  {background:var(--info-lt)}
+
+.stat-label{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
+.stat-value{font-family:'JetBrains Mono',monospace;font-size:27px;font-weight:700;color:var(--text-1);line-height:1;margin-bottom:4px;letter-spacing:-.02em}
+.stat-desc{font-size:11px;color:var(--text-3);margin-top:1px}
+.stat-badge{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:3px 9px;border-radius:99px;
+  font-size:10.5px;font-weight:600;margin-top:10px;
+}
+.b-green {background:var(--success-lt);color:var(--success)}
+.b-red   {background:var(--danger-lt); color:var(--danger)}
+.b-amber {background:var(--warning-lt);color:var(--warning)}
+.b-blue  {background:#EEF3FF;         color:var(--primary)}
+.b-cyan  {background:var(--info-lt);  color:var(--info)}
+
+/* ══ CARDS ══ */
+.row{display:flex;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.col-5{flex:0 0 calc(41.66% - 8px);min-width:280px}
+.col-7{flex:0 0 calc(58.33% - 8px);min-width:300px}
+.col-6{flex:0 0 calc(50% - 8px);min-width:280px}
+.col-4{flex:0 0 calc(33.33% - 8px);min-width:240px}
+.col-8{flex:0 0 calc(66.66% - 8px);min-width:300px}
+.col-12{flex:0 0 100%}
+@media(max-width:900px){.col-5,.col-7,.col-6,.col-4,.col-8{flex:0 0 100%}}
+
+.card{
+  background:var(--surface);border-radius:var(--r);
+  border:1px solid var(--border);box-shadow:var(--sh1);
+  overflow:hidden;flex:1;min-width:0;
+}
+.card-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:16px 20px 12px;border-bottom:1px solid var(--border);
+  flex-wrap:wrap;gap:8px;
+}
+.card-title{font-size:13.5px;font-weight:700;color:var(--text-1)}
+.card-sub  {font-size:11px;color:var(--text-3);margin-top:2px}
+.card-body {padding:20px}
+.card-body.p0{padding:0}
+.cw{position:relative}
+.h200{height:200px}.h240{height:240px}.h270{height:270px}
+.h300{height:300px}.h360{height:360px}.h440{height:440px}.h480{height:480px}
+
+/* Legend */
+.legend{display:flex;gap:14px;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:var(--text-2)}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* ══ TABLE ══ */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:var(--bg);color:var(--text-3);
+  font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:10px 16px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;
+}
+tbody td{
+  padding:12px 16px;border-bottom:1px solid var(--bg);
+  color:var(--text-1);vertical-align:top;line-height:1.45;
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--bg)}
+.mono{font-family:'JetBrains Mono',monospace;font-size:12px}
+.pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;border-radius:99px;font-size:10.5px;font-weight:600;
+}
+.p-green {background:var(--success-lt);color:var(--success);border:1px solid rgba(22,163,74,.2)}
+.p-amber {background:var(--warning-lt);color:var(--warning);border:1px solid rgba(217,119,6,.2)}
+.p-red   {background:var(--danger-lt); color:var(--danger);border:1px solid rgba(220,38,38,.2)}
+.p-blue  {background:#EEF3FF;color:var(--primary);border:1px solid rgba(27,63,122,.2)}
+.p-orange{background:var(--accent-lt); color:var(--accent);border:1px solid rgba(232,97,10,.2)}
+
+/* ══ PROGRESS ══ */
+.prog-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bg)}
+.prog-item:last-child{border-bottom:none}
+.prog-rank{
+  width:28px;height:28px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;
+  background:var(--bg);color:var(--text-3);
+}
+.rk-gold  {background:var(--warning-lt);color:var(--warning)}
+.rk-silver{background:#E2E8F0;color:#475569}
+.rk-bronze{background:var(--accent-lt);color:var(--accent)}
+.prog-info{flex:1;min-width:0}
+.prog-name{font-size:12.5px;font-weight:600;color:var(--text-1);line-height:1.4}
+.prog-code{font-size:10px;color:var(--text-3);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.prog-bar-col{width:130px;flex-shrink:0}
+.prog-track{height:7px;background:var(--bg);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;transition:width 1.2s ease}
+.prog-val{width:48px;text-align:right;font-size:11px;font-weight:600;color:var(--text-2);font-family:'JetBrains Mono',monospace;flex-shrink:0}
+
+/* ══ GAUGES ══ */
+.gauge-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
+@media(max-width:900px){.gauge-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:540px){.gauge-grid{grid-template-columns:repeat(2,1fr)}}
+.gauge-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 8px;
+  text-align:center;box-shadow:var(--sh1);
+}
+.g-month{font-size:10.5px;font-weight:700;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.g-ring {position:relative;width:78px;height:78px;margin:0 auto 10px}
+.g-ring svg{transform:rotate(-90deg)}
+.g-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.g-pct{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700}
+.g-lbl{font-size:9px;color:var(--text-3)}
+.g-count{font-size:10px;color:var(--text-3);margin-top:6px}
+
+/* Section label */
+.sec-lbl{display:flex;align-items:center;gap:8px;margin-bottom:14px;margin-top:4px}
+.sec-bar{width:3.5px;height:17px;background:var(--accent);border-radius:99px}
+.sec-text{font-size:13px;font-weight:700;color:var(--text-1)}
+
+/* ══ MOBILE ══ */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:199;opacity:0;transition:opacity .25s}
+.sb-overlay.show{opacity:1}
+@media(max-width:900px){
+  .main{margin-left:0}
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .hamburger{display:flex}
+  .sb-overlay{display:block}
+  .photo-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-illus{display:none}
+  .hero-divider{display:none}
+}
+@media(max-width:540px){
+  .content{padding:14px}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .photo-grid{grid-template-columns:1fr 1fr}
+  .hero-content{padding:20px 18px}
+  .hero-title{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════ SIDEBAR ════════════ -->
+<aside class="sidebar" id="sidebar">
+
+  <!-- Logo Brand -->
+  <div class="sb-brand">
+    <div class="sb-logo-wrap">
+      <img class="sb-logo-img"
+           src="https://rmkgi.com/assets/images/Logo-RMK.png"
+           alt="RMK Group Logo"
+           onerror="this.closest('.sb-logo-wrap').style.display='none';document.getElementById('sb-fb').style.display='flex'"/>
+    </div>
+    <!-- Fallback brand block -->
+    <div class="sb-logo-fallback" id="sb-fb" style="display:none">
+      <div class="sb-logo-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="11" r="4" stroke="#fff" stroke-width="2"/>
+          <circle cx="11" cy="3.5"  r="1.8" fill="#fff"/>
+          <circle cx="11" cy="18.5" r="1.8" fill="#fff"/>
+          <circle cx="3.5" cy="11" r="1.8" fill="#fff"/>
+          <circle cx="18.5" cy="11" r="1.8" fill="#fff"/>
+          <circle cx="5.5"  cy="5.5"  r="1.5" fill="#fff"/>
+          <circle cx="16.5" cy="5.5"  r="1.5" fill="#fff"/>
+          <circle cx="5.5"  cy="16.5" r="1.5" fill="#fff"/>
+          <circle cx="16.5" cy="16.5" r="1.5" fill="#fff"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sb-brand-text">RMK Group</div>
+        <div class="sb-brand-sub">PT. Rantai Mulia Kencana</div>
+      </div>
+    </div>
+
+    <!-- Company address mini-card -->
+    <div class="sb-divider-info">
+      <p><strong>PT. Rantai Mulia Kencana</strong><br>Divisi Logistic · RMK Group</p>
+      <p style="margin-top:5px">Wisma RMK, Jl. Puri Kencana Blok M4/1<br>Jakarta Barat 11610</p>
+    </div>
+  </div>
+
+  <div class="sb-section">Menu Utama</div>
+  <a class="nav-item active" onclick="switchPage('overview',this)">
+    <span class="nav-icon">📊</span> Overview
+    <span class="nav-badge">2026</span>
+  </a>
+  <a class="nav-item" onclick="switchPage('inventory',this)">
+    <span class="nav-icon">🏭</span> Inventory &amp; SOH
+  </a>
+  <a class="nav-item" onclick="switchPage('movement',this)">
+    <span class="nav-icon">📦</span> Good Issue &amp; GR
+  </a>
+  <a class="nav-item" onclick="switchPage('wo',this)">
+    <span class="nav-icon">🔧</span> Work Order (WO)
+  </a>
+  <a class="nav-item" onclick="switchPage('items',this)">
+    <span class="nav-icon">🏆</span> Top Items
+  </a>
+
+  <div class="sb-section" style="margin-top:6px">Referensi</div>
+  <a class="nav-item">
+    <span class="nav-icon">📋</span> Master Data
+  </a>
+  <a class="nav-item">
+    <span class="nav-icon">📈</span> Laporan Analitik
+  </a>
+  <a class="nav-item">
+    <span class="nav-icon">⚙️</span> Pengaturan
+  </a>
+  <a class="nav-item" href="https://rmkgi.com" target="_blank">
+    <span class="nav-icon">🌐</span> Website RMK
+  </a>
+
+  <div class="sb-bottom">
+    <!-- Wisma RMK building photo -->
+    <div style="margin:0 0 12px;border-radius:8px;overflow:hidden;height:80px;position:relative">
+      <img src="https://rmkgi.com/assets/images/gallery-16.jpg"
+           alt="Fasilitas RMK"
+           style="width:100%;height:100%;object-fit:cover"
+           onerror="this.parentElement.style.display='none'"/>
+      <div style="position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(15,34,64,.85));display:flex;align-items:flex-end;padding:8px 10px">
+        <span style="font-size:9.5px;font-weight:600;color:#fff;letter-spacing:.05em">FASILITAS OPERASIONAL</span>
+      </div>
+    </div>
+    <div class="sb-profile">
+      <div class="sb-avatar">RMK</div>
+      <div>
+        <div class="sb-profile-name">Warehouse Sales</div>
+        <div class="sb-profile-role">Inventory Management · 2026</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+<!-- ════════════ MAIN ════════════ -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <!-- Logo in topbar -->
+    <img class="topbar-logo"
+         src="https://rmkgi.com/assets/images/Logo-RMK.png"
+         alt="RMK"
+         onerror="this.style.display='none'"/>
+    <div class="topbar-divider"></div>
+    <div class="topbar-info">
+      <div class="topbar-title" id="tb-title">Overview — Semester I 2026</div>
+      <div class="topbar-sub"   id="tb-sub">KPI Inventory · Warehouse · Marketing · PT. Rantai Mulia Kencana</div>
+    </div>
+    <div class="topbar-pill tp-period">📅 Jan – Jun 2026</div>
+    <div class="topbar-pill tp-live"><div class="live-dot"></div>Live</div>
+    <button class="topbar-btn" title="Notifikasi">🔔</button>
+    <button class="topbar-btn" title="Unduh Laporan">⬇</button>
+  </header>
+
+  <div class="content">
+
+  <!-- ██████████ PAGE: OVERVIEW ██████████ -->
+  <div class="page active" id="page-overview">
+
+    <!-- HERO BANNER – foto nyata dari rmkgi.com -->
+    <div class="hero-banner">
+      <div class="hero-bg-photo"
+           style="background-image:url('https://rmkgi.com/assets/images/head-3.jpg')">
+      </div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+
+        <!-- Logo badge -->
+        <div class="hero-logo-badge">
+          <img class="hero-logo-img"
+               src="https://rmkgi.com/assets/images/Logo-RMK.png"
+               alt="RMK Group"
+               onerror="this.style.display='none'"/>
+          <div class="hero-logo-sub">Integrated Innovation</div>
+        </div>
+
+        <div class="hero-divider"></div>
+
+        <!-- Text -->
+        <div class="hero-body">
+          <div class="hero-eyebrow">KPI Dashboard · Semester I 2026</div>
+          <div class="hero-title">Conveyor, Chain &amp; Industrial<br>Parts — Inventory Control</div>
+          <div class="hero-desc">PT. Rantai Mulia Kencana · Divisi Logistic · RMK Group Indonesia</div>
+          <div class="hero-stats">
+            <div><div class="hero-stat-val">4.09 B</div><div class="hero-stat-lbl">IDR Inventory</div></div>
+            <div><div class="hero-stat-val">1.831</div><div class="hero-stat-lbl">SKU Aktif</div></div>
+            <div><div class="hero-stat-val">1.357</div><div class="hero-stat-lbl">Transaksi GI</div></div>
+            <div><div class="hero-stat-val">1.127</div><div class="hero-stat-lbl">WO Closed</div></div>
+          </div>
+        </div>
+
+        <!-- Industrial SVG illustration -->
+        <div class="hero-illus">
+          <svg width="190" height="100" viewBox="0 0 190 100" fill="none">
+            <!-- Conveyor belt -->
+            <rect x="10" y="40" width="170" height="20" rx="5" fill="rgba(232,97,10,.15)" stroke="rgba(232,97,10,.5)" stroke-width="1.5"/>
+            <line x1="36" y1="40" x2="36" y2="60" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>
+            <line x1="60" y1="40" x2="60" y2="60" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>
+            <line x1="84" y1="40" x2="84" y2="60" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>
+            <line x1="108" y1="40" x2="108" y2="60" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>
+            <line x1="132" y1="40" x2="132" y2="60" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>
+            <line x1="156" y1="40" x2="156" y2="60" stroke="rgba(255,255,255,.1)" stroke-width="1.5"/>
+            <!-- Drums -->
+            <circle cx="20" cy="50" r="12" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2.5"/>
+            <circle cx="20" cy="50" r="4" fill="#E8610A"/>
+            <circle cx="170" cy="50" r="12" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2.5"/>
+            <circle cx="170" cy="50" r="4" fill="#E8610A"/>
+            <!-- Boxes -->
+            <rect x="44" y="24" width="22" height="18" rx="2.5" fill="rgba(232,97,10,.7)" stroke="rgba(255,200,80,.45)" stroke-width="1"/>
+            <line x1="44" y1="33" x2="66" y2="33" stroke="rgba(255,200,80,.3)" stroke-width="1"/>
+            <line x1="55" y1="24" x2="55" y2="42" stroke="rgba(255,200,80,.3)" stroke-width="1"/>
+            <rect x="85" y="22" width="26" height="20" rx="2.5" fill="rgba(232,97,10,.5)" stroke="rgba(255,200,80,.3)" stroke-width="1"/>
+            <rect x="126" y="25" width="19" height="16" rx="2.5" fill="rgba(232,97,10,.38)" stroke="rgba(255,200,80,.25)" stroke-width="1"/>
+            <!-- Chain links -->
+            <ellipse cx="155" cy="16" rx="7" ry="4" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>
+            <ellipse cx="165" cy="16" rx="7" ry="4" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>
+            <ellipse cx="175" cy="16" rx="7" ry="4" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>
+            <!-- Legs -->
+            <line x1="26" y1="62" x2="22" y2="88" stroke="rgba(255,255,255,.2)" stroke-width="2"/>
+            <line x1="164" y1="62" x2="168" y2="88" stroke="rgba(255,255,255,.2)" stroke-width="2"/>
+            <line x1="75" y1="62" x2="73" y2="88" stroke="rgba(255,255,255,.15)" stroke-width="1.5"/>
+            <line x1="115" y1="62" x2="117" y2="88" stroke="rgba(255,255,255,.15)" stroke-width="1.5"/>
+            <line x1="10" y1="88" x2="180" y2="88" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHOTO GALLERY STRIP – foto nyata dari rmkgi.com -->
+    <div class="photo-grid">
+      <div class="photo-thumb f1">
+        <img src="https://rmkgi.com/assets/images/gallery-6.jpg" alt="Engineering" onerror="this.style.display='none'"/>
+        <div class="photo-thumb-label">Engineering</div>
+      </div>
+      <div class="photo-thumb f2">
+        <img src="https://rmkgi.com/assets/images/gallery-7.jpg" alt="Operations" onerror="this.style.display='none'"/>
+        <div class="photo-thumb-label">Operasional</div>
+      </div>
+      <div class="photo-thumb f3">
+        <img src="https://rmkgi.com/assets/images/gallery-15.jpg" alt="Infrastruktur" onerror="this.style.display='none'"/>
+        <div class="photo-thumb-label">Infrastruktur</div>
+      </div>
+      <div class="photo-thumb f4">
+        <img src="https://rmkgi.com/assets/images/gallery-17.jpg" alt="Industrial" onerror="this.style.display='none'"/>
+        <div class="photo-thumb-label">Industrial</div>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stat-grid">
+      <div class="stat-card c-blue">
+        <div class="stat-top"><div><div class="stat-label">Inventory Value</div><div class="stat-value">4.09 B</div><div class="stat-desc">IDR Total Cost SOH · Juni 2026</div></div><div class="stat-icon i-blue">🏗️</div></div>
+        <span class="stat-badge b-amber">⟶ Stabil</span>
+      </div>
+      <div class="stat-card c-purple">
+        <div class="stat-top"><div><div class="stat-label">Total SKU</div><div class="stat-value">1.831</div><div class="stat-desc">Part number terdaftar</div></div><div class="stat-icon i-purple">🔩</div></div>
+        <span class="stat-badge b-blue">Aktif</span>
+      </div>
+      <div class="stat-card c-red">
+        <div class="stat-top"><div><div class="stat-label">Good Issue YTD</div><div class="stat-value">681 M</div><div class="stat-desc">IDR · 1.357 transaksi</div></div><div class="stat-icon i-red">📤</div></div>
+        <span class="stat-badge b-red">Keluar</span>
+      </div>
+      <div class="stat-card c-green">
+        <div class="stat-top"><div><div class="stat-label">Good Received YTD</div><div class="stat-value">599 M</div><div class="stat-desc">IDR · 1.016 transaksi</div></div><div class="stat-icon i-green">📥</div></div>
+        <span class="stat-badge b-green">Masuk</span>
+      </div>
+      <div class="stat-card c-orange">
+        <div class="stat-top"><div><div class="stat-label">WO Closed YTD</div><div class="stat-value">1.127</div><div class="stat-desc">Work order disuplai</div></div><div class="stat-icon i-orange">🔧</div></div>
+        <span class="stat-badge b-green">✓ Selesai</span>
+      </div>
+      <div class="stat-card c-red">
+        <div class="stat-top"><div><div class="stat-label">ITO Ratio Avg</div><div class="stat-value">0.33×</div><div class="stat-desc">Target 3.0× per bulan</div></div><div class="stat-icon i-red">🔄</div></div>
+        <span class="stat-badge b-red">↓ Di bawah target</span>
+      </div>
+      <div class="stat-card c-cyan">
+        <div class="stat-top"><div><div class="stat-label">Item Berstock</div><div class="stat-value">1.441</div><div class="stat-desc">78.7% dari master data</div></div><div class="stat-icon i-cyan">📦</div></div>
+        <span class="stat-badge b-green">✓ SOH &gt; 0</span>
+      </div>
+      <div class="stat-card c-amber">
+        <div class="stat-top"><div><div class="stat-label">Net Flow YTD</div><div class="stat-value">−81 M</div><div class="stat-desc">GI lebih besar dari GR</div></div><div class="stat-icon i-amber">⚖️</div></div>
+        <span class="stat-badge b-amber">⚠ Net outflow</span>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW 1 -->
+    <div class="row">
+      <div class="card col-7">
+        <div class="card-header">
+          <div><div class="card-title">Good Issue vs Good Received per Bulan</div><div class="card-sub">Nilai IDR · Jan–Jun 2026</div></div>
+          <div class="legend"><div class="leg"><div class="leg-dot" style="background:#DC2626"></div>GI</div><div class="leg"><div class="leg-dot" style="background:#16A34A"></div>GR</div></div>
+        </div>
+        <div class="card-body"><div class="cw h270"><canvas id="c-giVSgr"></canvas></div></div>
+      </div>
+      <div class="card col-5">
+        <div class="card-header"><div><div class="card-title">Status Item Inventaris</div><div class="card-sub">Komposisi 1.831 SKU</div></div></div>
+        <div class="card-body"><div class="cw h270"><canvas id="c-dist"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW 2 -->
+    <div class="row">
+      <div class="card col-6">
+        <div class="card-header"><div><div class="card-title">ITO Ratio vs Target</div><div class="card-sub">Aktual vs 3× per bulan</div></div></div>
+        <div class="card-body"><div class="cw h240"><canvas id="c-ito"></canvas></div></div>
+      </div>
+      <div class="card col-6">
+        <div class="card-header"><div><div class="card-title">Volume Transaksi</div><div class="card-sub">Jumlah item GI vs GR per bulan</div></div></div>
+        <div class="card-body"><div class="cw h240"><canvas id="c-vol"></canvas></div></div>
+      </div>
+    </div>
+
+  </div><!-- /page-overview -->
+
+  <!-- ██████████ PAGE: INVENTORY ██████████ -->
+  <div class="page" id="page-inventory">
+    <div class="pg-header">
+      <div><div class="pg-title">Inventory &amp; Stok On Hand</div><div class="pg-sub">Status gudang PT. Rantai Mulia Kencana — Juni 2026</div></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card c-blue"><div class="stat-top"><div><div class="stat-label">Total Nilai SOH</div><div class="stat-value">4.09 B</div><div class="stat-desc">IDR cost inventaris</div></div><div class="stat-icon i-blue">🏗️</div></div><span class="stat-badge b-amber">Stabil</span></div>
+      <div class="stat-card c-green"><div class="stat-top"><div><div class="stat-label">Item Aktif (Qty&gt;0)</div><div class="stat-value">1.446</div><div class="stat-desc">SKU stok tersedia</div></div><div class="stat-icon i-green">✅</div></div><span class="stat-badge b-green">Tersedia</span></div>
+      <div class="stat-card c-amber"><div class="stat-top"><div><div class="stat-label">Tanpa Max/Min Level</div><div class="stat-value">1.441</div><div class="stat-desc">Belum ada batas stok</div></div><div class="stat-icon i-amber">⚠️</div></div><span class="stat-badge b-amber">Perlu update</span></div>
+      <div class="stat-card c-orange"><div class="stat-top"><div><div class="stat-label">Fast Moving</div><div class="stat-value">63</div><div class="stat-desc">Item bergerak cepat</div></div><div class="stat-icon i-orange">🚀</div></div><span class="stat-badge b-green">3.4% SOH</span></div>
+    </div>
+    <div class="row">
+      <div class="card col-6"><div class="card-header"><div><div class="card-title">Klasifikasi Pergerakan Item</div><div class="card-sub">Fast / Slow / Dead stock</div></div></div><div class="card-body"><div class="cw h270"><canvas id="c-moving"></canvas></div></div></div>
+      <div class="card col-6"><div class="card-header"><div><div class="card-title">SOH vs Total Master Data</div><div class="card-sub">% item berstock dari total SKU</div></div></div><div class="card-body"><div class="cw h270"><canvas id="c-sohComp"></canvas></div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Top 10 Item — Qty Terbanyak di Gudang</div><div class="card-sub">Stok on hand saat ini</div></div></div>
+      <div class="card-body p0"><div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>Deskripsi Item</th><th>Qty</th><th>Satuan</th><th>Level</th></tr></thead>
+        <tbody id="soh-tbody"></tbody>
+      </table></div></div>
+    </div>
+  </div>
+
+  <!-- ██████████ PAGE: MOVEMENT ██████████ -->
+  <div class="page" id="page-movement">
+    <div class="pg-header">
+      <div><div class="pg-title">Good Issue &amp; Good Received</div><div class="pg-sub">Pergerakan barang masuk &amp; keluar — Jan–Jun 2026</div></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card c-red"><div class="stat-top"><div><div class="stat-label">Total Nilai GI</div><div class="stat-value">681 M</div><div class="stat-desc">IDR · 6 bulan</div></div><div class="stat-icon i-red">📤</div></div><span class="stat-badge b-red">1.357 transaksi</span></div>
+      <div class="stat-card c-green"><div class="stat-top"><div><div class="stat-label">Total Nilai GR</div><div class="stat-value">599 M</div><div class="stat-desc">IDR · 6 bulan</div></div><div class="stat-icon i-green">📥</div></div><span class="stat-badge b-green">1.016 transaksi</span></div>
+      <div class="stat-card c-amber"><div class="stat-top"><div><div class="stat-label">Selisih GI−GR</div><div class="stat-value">+81 M</div><div class="stat-desc">Net outflow IDR</div></div><div class="stat-icon i-amber">⚖️</div></div><span class="stat-badge b-amber">⚠ GI &gt; GR</span></div>
+      <div class="stat-card c-blue"><div class="stat-top"><div><div class="stat-label">Rata-rata GI/Bulan</div><div class="stat-value">113 M</div><div class="stat-desc">IDR per bulan avg</div></div><div class="stat-icon i-blue">📊</div></div><span class="stat-badge b-blue">6 bulan</span></div>
+    </div>
+    <div class="row">
+      <div class="card col-6"><div class="card-header"><div><div class="card-title">Nilai Good Issue per Bulan</div><div class="card-sub">IDR barang keluar</div></div></div><div class="card-body"><div class="cw h240"><canvas id="c-giM"></canvas></div></div></div>
+      <div class="card col-6"><div class="card-header"><div><div class="card-title">Nilai Good Received per Bulan</div><div class="card-sub">IDR barang masuk</div></div></div><div class="card-body"><div class="cw h240"><canvas id="c-grM"></canvas></div></div></div>
+    </div>
+    <div class="row">
+      <div class="card col-6"><div class="card-header"><div><div class="card-title">Net Flow per Bulan</div><div class="card-sub">Merah=outflow · Hijau=inflow</div></div></div><div class="card-body"><div class="cw h240"><canvas id="c-net"></canvas></div></div></div>
+      <div class="card col-6"><div class="card-header"><div><div class="card-title">Volume Transaksi</div><div class="card-sub">Jumlah item GI vs GR</div></div></div><div class="card-body"><div class="cw h240"><canvas id="c-volM"></canvas></div></div></div>
+    </div>
+  </div>
+
+  <!-- ██████████ PAGE: WORK ORDER ██████████ -->
+  <div class="page" id="page-wo">
+    <div class="pg-header">
+      <div><div class="pg-title">Kinerja Work Order (WO)</div><div class="pg-sub">Waktu suplai &amp; pencapaian target — Jan–Jun 2026</div></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card c-green"><div class="stat-top"><div><div class="stat-label">WO Closed YTD</div><div class="stat-value">1.127</div><div class="stat-desc">Berhasil disuplai</div></div><div class="stat-icon i-green">✅</div></div><span class="stat-badge b-green">Selesai</span></div>
+      <div class="stat-card c-amber"><div class="stat-top"><div><div class="stat-label">Target ≤ 4 Hari</div><div class="stat-value">70%</div><div class="stat-desc">Benchmark respon</div></div><div class="stat-icon i-amber">🎯</div></div><span class="stat-badge b-amber">Benchmark</span></div>
+      <div class="stat-card c-red"><div class="stat-top"><div><div class="stat-label">Avg Suplai Juni</div><div class="stat-value">17.9 hr</div><div class="stat-desc">Hari rata-rata</div></div><div class="stat-icon i-red">⏱️</div></div><span class="stat-badge b-red">↑ Naik signifikan</span></div>
+      <div class="stat-card c-red"><div class="stat-top"><div><div class="stat-label">WO Juni &gt; 10 Hari</div><div class="stat-value">9.4%</div><div class="stat-desc">Melewati batas ideal</div></div><div class="stat-icon i-red">⚠️</div></div><span class="stat-badge b-red">⚠ Monitor</span></div>
+    </div>
+    <div class="sec-lbl"><div class="sec-bar"></div><span class="sec-text">Pencapaian Target ≤ 4 Hari per Bulan</span></div>
+    <div class="gauge-grid" id="gauge-grid"></div>
+    <div class="row">
+      <div class="card col-12">
+        <div class="card-header">
+          <div><div class="card-title">Distribusi Waktu Suplai WO per Bulan (%)</div><div class="card-sub">Stacked — 1–4 hari · 5–10 hari · 11–30 hari vs target 70%</div></div>
+          <div class="legend"><div class="leg"><div class="leg-dot" style="background:#16A34A"></div>1–4 Hari</div><div class="leg"><div class="leg-dot" style="background:#D97706"></div>5–10 Hari</div><div class="leg"><div class="leg-dot" style="background:#DC2626"></div>11–30 Hari</div></div>
+        </div>
+        <div class="card-body"><div class="cw h300"><canvas id="c-woDist"></canvas></div></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="card col-12">
+        <div class="card-header"><div><div class="card-title">WO Closed per Bulan</div><div class="card-sub">Total work order berhasil disuplai</div></div></div>
+        <div class="card-body"><div class="cw h240"><canvas id="c-woClosed"></canvas></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ██████████ PAGE: TOP ITEMS ██████████ -->
+  <div class="page" id="page-items">
+    <div class="pg-header">
+      <div><div class="pg-title">Top 10 Item — Nilai Good Issue Tertinggi</div><div class="pg-sub">Akumulasi Jan–Jun 2026 · Nama lengkap, tidak terpotong</div></div>
+    </div>
+
+    <!-- Table -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><div><div class="card-title">Detail Top 10 Item by Nilai GI</div><div class="card-sub">Kode part · Deskripsi lengkap · Nilai · Proporsi</div></div></div>
+      <div class="card-body p0"><div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:42px">#</th>
+              <th>Kode Part</th>
+              <th>Deskripsi Item</th>
+              <th>Nilai GI (IDR)</th>
+              <th>Proporsi</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="top-tbody"></tbody>
+        </table>
+      </div></div>
+    </div>
+
+    <!-- Horizontal bar -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header"><div><div class="card-title">Visualisasi — Nilai GI Top 10 Item</div><div class="card-sub">IDR · Horizontal bar · Label nama lengkap</div></div></div>
+      <div class="card-body"><div class="cw h480"><canvas id="c-topBar"></canvas></div></div>
+    </div>
+
+    <!-- Progress bars -->
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Proporsi Nilai GI per Item</div><div class="card-sub">% dari total nilai GI top 10</div></div></div>
+      <div class="card-body" id="prog-wrap"></div>
+    </div>
+  </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+/* ─── DATA ─── */
+const MS  = ['Jan','Feb','Mar','Apr','Mei','Jun'];
+const MF  = ['January','Febuary','Maret','April','May','June'];
+const GIV = [135010198,142820399,78146634,165478564,66096431,93628967];
+const GRV = [178472521,76047948, 70855489,158734414,74631930,40946199];
+const GII = [241,244,174,274,199,225];
+const GRI = [238,100,131,212,196,139];
+const ITO = [0.3956,0.4185,0.2290,0.4849,0.1937,0.2744];
+const WOC = [215,183,140,271,181,137];
+const W14 = [0.8958,0.7787,0.8046,0.9891,0.9095,0.7611];
+const W510= [0.1042,0.1787,0.1839,0.0109,0.1444,0.1013];
+const W11 = [0.0000,0.0425,0.0115,0.0000,0.0000,0.0944];
+
+const ITEMS = [
+  {code:'RS-C2042-SS-DC', name:'ROLLER CHAIN C2042 STAINLESS STEEL DAICHAIN',              val:151900000},
+  {code:'RS140-1R-DC',    name:'ROLLER CHAIN RS140-1R DAICHAIN',                            val:92800000},
+  {code:'OSC-SS568H-DC',  name:'OFFSET SIDEBAR CHAIN SS 568-H DAICHAIN',                    val:31500000},
+  {code:'DS-3100R-A2',    name:'CONVEYOR CHAIN DS-3100-R-A2 EVERY LINK DAICHAIN',           val:31050000},
+  {code:'C2060-BA1-DC',   name:'DOUBLE PITCH CHAIN C2060 BA1 EVERY LINK DAICHAIN',          val:28800000},
+  {code:'08-09022-SPK',   name:'SPROCKET FOR DRIVER ROLLER YELLOW — 08B-2R 14 TEETH',       val:27075000},
+  {code:'DS-5100R',       name:'CONVEYOR CHAIN DS 5100-R',                                  val:22700000},
+  {code:'C2100-BA2-DC',   name:'DOUBLE PITCH CHAIN C2100 BA2 EVERY LINK DAICHAIN',          val:21725000},
+  {code:'RS80-20T-SPK',   name:'SPROCKET RS80-2R × 20 TEETH',                               val:20300000},
+  {code:'RS80-28T-SPK',   name:'SPROCKET RS80-2R × 28 TEETH',                               val:20239000},
+];
+
+const SOH = [
+  {desc:'CONNECTING LINK 35-1R',                             qty:4850,unit:'PCS'},
+  {desc:'KANCING MODULAR BELT 550 K35',                      qty:4500,unit:'PCS'},
+  {desc:'CONNECTING LINK 06B-2',                             qty:4472,unit:'PCS'},
+  {desc:'CONNECTING LINK RS08B-1R',                          qty:3926,unit:'PCS'},
+  {desc:'CONNECTING LINK 35-2R',                             qty:2946,unit:'PCS'},
+  {desc:'SPROCKET FOR DRIVER ROLLER YELLOW 08B-2R 14T',      qty:1500,unit:'PCS'},
+  {desc:'ROLLER CHAIN RS40-1R STAINLESS STEEL DAICHAIN',     qty:850, unit:'ROL'},
+  {desc:'CONNECTING LINK 40-2 SS RATA',                      qty:650, unit:'PCS'},
+  {desc:'TABLE TOP CHAIN SSE 881 TAB K325',                   qty:430, unit:'ROL'},
+  {desc:'SPROCKET RS40 × 18 TEETH',                           qty:350, unit:'PCS'},
+];
+
+/* ─── CHART CONFIG ─── */
+Chart.defaults.color='#64748B';
+Chart.defaults.font.family='Inter';
+Chart.defaults.font.size=12;
+
+const GC='rgba(226,232,240,.85)';
+const C={
+  blue:'#1B3F7A',green:'#16A34A',red:'#DC2626',orange:'#E8610A',
+  amber:'#D97706',purple:'#7C3AED',cyan:'#0891B2',
+  blueA:'rgba(27,63,122,.75)',greenA:'rgba(22,163,74,.75)',
+  redA:'rgba(220,38,38,.75)',orangeA:'rgba(232,97,10,.75)',
+};
+const sc={x:{grid:{color:GC,drawBorder:false}},y:{grid:{color:GC,drawBorder:false},ticks:{callback:v=>fmt(v)}}};
+
+function fmt(n){if(Math.abs(n)>=1e9)return(n/1e9).toFixed(2)+' B';if(Math.abs(n)>=1e6)return(n/1e6).toFixed(1)+' M';if(Math.abs(n)>=1e3)return(n/1e3).toFixed(0)+' K';return n}
+function idr(n){return'Rp '+n.toLocaleString('id-ID')}
+function mk(id,cfg){const e=document.getElementById(id);if(!e)return;return new Chart(e.getContext('2d'),cfg)}
+
+/* ─── OVERVIEW ─── */
+function buildOverview(){
+  mk('c-giVSgr',{type:'bar',
+    data:{labels:MS,datasets:[
+      {label:'GI',data:GIV,backgroundColor:C.redA,borderColor:C.red,borderWidth:1,borderRadius:6},
+      {label:'GR',data:GRV,backgroundColor:C.greenA,borderColor:C.green,borderWidth:1,borderRadius:6},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:sc}
+  });
+  mk('c-dist',{type:'doughnut',
+    data:{labels:['Berstock','Belum Harga','Ada Harga','Tanpa Stok'],
+      datasets:[{data:[1441,1441,50,390],
+        backgroundColor:['rgba(22,163,74,.8)','rgba(217,119,6,.8)','rgba(27,63,122,.8)','rgba(148,163,184,.5)'],
+        borderColor:['#16A34A','#D97706','#1B3F7A','#CBD5E1'],borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:14,font:{size:11}}}}}
+  });
+  mk('c-ito',{type:'line',
+    data:{labels:MS,datasets:[
+      {label:'ITO',data:ITO,borderColor:C.blue,backgroundColor:'rgba(27,63,122,.1)',fill:true,tension:.4,pointRadius:5,pointBackgroundColor:C.blue,pointBorderColor:'#fff',pointBorderWidth:2},
+      {label:'Target 3×',data:Array(6).fill(3),borderColor:C.orange,borderDash:[7,4],pointRadius:0,fill:false,borderWidth:2},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{boxWidth:12}}},
+      scales:{x:{grid:{color:GC}},y:{grid:{color:GC},min:0,max:3.5}}}
+  });
+  mk('c-vol',{type:'line',
+    data:{labels:MS,datasets:[
+      {label:'GI',data:GII,borderColor:C.red,backgroundColor:'rgba(220,38,38,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:C.red,pointBorderColor:'#fff',pointBorderWidth:2},
+      {label:'GR',data:GRI,borderColor:C.green,backgroundColor:'rgba(22,163,74,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:C.green,pointBorderColor:'#fff',pointBorderWidth:2},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:12}}},scales:{x:{grid:{color:GC}},y:{grid:{color:GC}}}}
+  });
+}
+
+/* ─── INVENTORY ─── */
+function buildInventory(){
+  mk('c-moving',{type:'bar',
+    data:{labels:['Fast Moving','Slow Moving','Dead Stock'],
+      datasets:[{data:[63,1278,490],
+        backgroundColor:[C.greenA,'rgba(217,119,6,.75)',C.redA],
+        borderColor:[C.green,C.amber,C.red],borderWidth:1,borderRadius:8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:GC}},y:{grid:{color:GC}}}}
+  });
+  mk('c-sohComp',{type:'doughnut',
+    data:{labels:['Berstock (1.446)','Tanpa Stok (385)'],
+      datasets:[{data:[1446,385],
+        backgroundColor:['rgba(27,63,122,.82)','rgba(203,213,225,.55)'],
+        borderColor:['#1B3F7A','#E2E8F0'],borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}
+  });
+  const tb=document.getElementById('soh-tbody');
+  SOH.forEach((r,i)=>{
+    const p=i<3?'<span class="pill p-red">🔴 Tinggi</span>':i<7?'<span class="pill p-amber">🟡 Sedang</span>':'<span class="pill p-blue">🔵 Normal</span>';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><strong>${i+1}</strong></td><td><strong>${r.desc}</strong></td><td class="mono"><strong>${r.qty.toLocaleString('id-ID')}</strong></td><td>${r.unit}</td><td>${p}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+/* ─── MOVEMENT ─── */
+function buildMovement(){
+  const bOpt={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:sc};
+  mk('c-giM',{type:'bar',data:{labels:MS,datasets:[{data:GIV,backgroundColor:C.redA,borderColor:C.red,borderWidth:1,borderRadius:6}]},options:bOpt});
+  mk('c-grM',{type:'bar',data:{labels:MS,datasets:[{data:GRV,backgroundColor:C.greenA,borderColor:C.green,borderWidth:1,borderRadius:6}]},options:bOpt});
+  const net=GIV.map((v,i)=>v-GRV[i]);
+  mk('c-net',{type:'bar',
+    data:{labels:MS,datasets:[{data:net,
+      backgroundColor:net.map(v=>v>0?C.redA:C.greenA),
+      borderColor:net.map(v=>v>0?C.red:C.green),borderWidth:1,borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:sc}
+  });
+  mk('c-volM',{type:'line',
+    data:{labels:MS,datasets:[
+      {label:'GI',data:GII,borderColor:C.red,backgroundColor:'rgba(220,38,38,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:C.red,pointBorderColor:'#fff',pointBorderWidth:2},
+      {label:'GR',data:GRI,borderColor:C.green,backgroundColor:'rgba(22,163,74,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:C.green,pointBorderColor:'#fff',pointBorderWidth:2},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:12}}},scales:{x:{grid:{color:GC}},y:{grid:{color:GC}}}}
+  });
+}
+
+/* ─── WORK ORDER ─── */
+function buildWO(){
+  const gg=document.getElementById('gauge-grid');
+  MF.forEach((m,i)=>{
+    const p=W14[i],hit=p>=.70;
+    const col=hit?'#16A34A':p>=.75?'#D97706':'#DC2626';
+    const r=34,ci=2*Math.PI*r,off=ci*(1-p);
+    const d=document.createElement('div');
+    d.className='gauge-box';
+    d.innerHTML=`
+      <div class="g-month">${MS[i]}</div>
+      <div class="g-ring">
+        <svg viewBox="0 0 80 80" width="78" height="78">
+          <circle cx="40" cy="40" r="${r}" fill="none" stroke="#E2E8F0" stroke-width="7.5"/>
+          <circle cx="40" cy="40" r="${r}" fill="none" stroke="${col}" stroke-width="7.5"
+            stroke-dasharray="${ci.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/>
+        </svg>
+        <div class="g-center">
+          <div class="g-pct" style="color:${col}">${(p*100).toFixed(0)}%</div>
+          <div class="g-lbl">≤ 4 hari</div>
+        </div>
+      </div>
+      <div>${hit?'<span class="pill p-green" style="font-size:10px">✓ Target</span>':'<span class="pill p-red" style="font-size:10px">✗ Miss</span>'}</div>
+      <div class="g-count">${WOC[i]} WO closed</div>`;
+    gg.appendChild(d);
+  });
+  mk('c-woDist',{type:'bar',
+    data:{labels:MS,datasets:[
+      {label:'1–4 Hari', data:W14.map(v=>+(v*100).toFixed(1)),backgroundColor:'rgba(22,163,74,.75)',borderRadius:{topLeft:4,topRight:4}},
+      {label:'5–10 Hari',data:W510.map(v=>+(v*100).toFixed(1)),backgroundColor:'rgba(217,119,6,.75)'},
+      {label:'11–30 Hari',data:W11.map(v=>+(v*100).toFixed(1)),backgroundColor:'rgba(220,38,38,.75)'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:GC},stacked:true},y:{grid:{color:GC},stacked:true,max:115,ticks:{callback:v=>v+'%'}}}}
+  });
+  mk('c-woClosed',{type:'bar',
+    data:{labels:MS,datasets:[{data:WOC,backgroundColor:C.blueA,borderColor:C.blue,borderWidth:1,borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:GC}},y:{grid:{color:GC}}}}
+  });
+}
+
+/* ─── TOP ITEMS ─── */
+function buildItems(){
+  const tot=ITEMS.reduce((a,b)=>a+b.val,0);
+  const tb=document.getElementById('top-tbody');
+  ITEMS.forEach((it,i)=>{
+    const p=((it.val/tot)*100).toFixed(1);
+    const rs=i===0?'background:var(--warning-lt);color:var(--warning)':i<3?'background:var(--accent-lt);color:var(--accent)':'background:var(--bg);color:var(--text-3)';
+    const cat=i===0?'<span class="pill p-red">🔥 #1</span>':i<3?'<span class="pill p-orange">⚡ Top 3</span>':'<span class="pill p-blue">📦 Regular</span>';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;font-weight:700;font-size:12px;${rs}">${i+1}</span></td>
+      <td><code style="font-size:11px;background:var(--bg);padding:2px 7px;border-radius:4px;color:var(--text-2);font-family:'JetBrains Mono',monospace">${it.code}</code></td>
+      <td style="min-width:300px"><div style="font-weight:600;color:var(--text-1);line-height:1.45">${it.name}</div></td>
+      <td class="mono" style="color:var(--primary);font-weight:700;white-space:nowrap">${idr(it.val)}</td>
+      <td class="mono">${p}%</td>
+      <td>${cat}</td>`;
+    tb.appendChild(tr);
+  });
+
+  mk('c-topBar',{type:'bar',
+    data:{
+      labels:ITEMS.map(it=>it.name),
+      datasets:[{
+        label:'Nilai GI (IDR)',
+        data:ITEMS.map(it=>it.val),
+        backgroundColor:ITEMS.map((_,i)=>i===0?C.orangeA:i<3?C.blueA:'rgba(27,63,122,.45)'),
+        borderColor:    ITEMS.map((_,i)=>i<3?C.orange:C.blue),
+        borderWidth:1,borderRadius:5,
+      }]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'  '+idr(ctx.raw)}}},
+      scales:{
+        x:{grid:{color:GC},ticks:{callback:v=>fmt(v)}},
+        y:{grid:{color:GC},ticks:{font:{size:12},color:'#0F172A',padding:8}},
+      }
+    }
+  });
+
+  const pw=document.getElementById('prog-wrap');
+  ITEMS.forEach((it,i)=>{
+    const p=(it.val/tot)*100;
+    const fc=i===0?C.orange:i<3?C.blue:'#94A3B8';
+    const rc=i===0?'rk-gold':i===1?'rk-silver':i===2?'rk-bronze':'';
+    const d=document.createElement('div');
+    d.className='prog-item';
+    d.innerHTML=`
+      <div class="prog-rank ${rc}">${i+1}</div>
+      <div class="prog-info">
+        <div class="prog-name">${it.name}</div>
+        <div class="prog-code">${it.code} · ${idr(it.val)}</div>
+      </div>
+      <div class="prog-bar-col">
+        <div class="prog-track">
+          <div class="prog-fill" style="width:${p.toFixed(1)}%;background:${fc}"></div>
+        </div>
+      </div>
+      <div class="prog-val">${p.toFixed(1)}%</div>`;
+    pw.appendChild(d);
+  });
+}
+
+/* ─── ROUTING ─── */
+const TITLES={
+  overview: ['Overview — Semester I 2026','KPI Inventory · Warehouse · Marketing · PT. Rantai Mulia Kencana'],
+  inventory:['Inventory & Stok On Hand','Status gudang — Juni 2026'],
+  movement: ['Good Issue & Good Received','Pergerakan barang — Jan–Jun 2026'],
+  wo:       ['Kinerja Work Order','Waktu suplai & pencapaian target'],
+  items:    ['Top 10 Items — Nilai GI Tertinggi','Akumulasi Jan–Jun 2026'],
+};
+const built={};
+
+function switchPage(tab,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('page-'+tab).classList.add('active');
+  const [t,s]=TITLES[tab]||['',''];
+  document.getElementById('tb-title').textContent=t;
+  document.getElementById('tb-sub').textContent=s;
+  closeSidebar();
+  if(!built[tab]){
+    built[tab]=true;
+    if(tab==='overview')  buildOverview();
+    if(tab==='inventory') buildInventory();
+    if(tab==='movement')  buildMovement();
+    if(tab==='wo')        buildWO();
+    if(tab==='items')     buildItems();
+  }
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sb-overlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('show');
+}
+
+/* INIT */
+buildOverview();
+built.overview=true;
+</script>
+</body>
+</html>
